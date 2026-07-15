@@ -5,6 +5,7 @@ build/
 .expo/
 .expo-shared/
 *.log
+*.tsbuildinfo
 .DS_Store
 .env
 .env.local
