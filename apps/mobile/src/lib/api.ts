@@ -27,4 +27,8 @@ export const api = {
     req<Order>("/api/orders/option", { method: "POST", body: JSON.stringify({ accountId: ACCOUNT_ID, ...input }) }),
   submitEtf: (input: { code: string; side: "subscribe" | "redeem"; units: number }) =>
     req<Order>("/api/orders/etf", { method: "POST", body: JSON.stringify({ accountId: ACCOUNT_ID, ...input }) }),
+  swaps: () => req<{ spec: any; quotes: any[] }[]>("/api/swaps"),
+  swap: (code: string, tenorMonths: number) => req<any>(`/api/swaps/${code}/${tenorMonths}`),
+  submitSwap: (input: { code: string; tenorMonths: number; side: Side; qty: number }) =>
+    req<Order>("/api/orders/swap", { method: "POST", body: JSON.stringify({ accountId: ACCOUNT_ID, ...input }) }),
 };

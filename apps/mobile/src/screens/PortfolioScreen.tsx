@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { FUTURES, ETFS } from "@cce/shared";
+import { FUTURES, ETFS, SWAPS } from "@cce/shared";
 import { Panel, monoFont } from "../components/Atoms";
 import { T } from "../theme";
 import { useAccount } from "../lib/AccountContext";
@@ -14,6 +14,7 @@ export default function PortfolioScreen() {
   const label = (p: any) => {
     if (p.assetClass === "future") return `${p.code} ${p.maturity}`;
     if (p.assetClass === "option") return `${p.code} ${p.optionType.toUpperCase()} ${p.strike}`;
+    if (p.assetClass === "swap") return `${p.code} — ${SWAPS[p.code].name[lang]} (${p.tenorMonths}${t.swap.months})`;
     return `${p.code} — ${ETFS[p.code].name[lang]}`;
   };
 

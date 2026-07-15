@@ -83,6 +83,22 @@ export function futuresVariationMargin(
   return side === "buy" ? d : -d;
 }
 
+/** Longer-tenor swaps carry more mark-to-market risk before the next reset, so
+ * initial margin scales gently with tenor on top of the underlying's own rate. */
+export function swapTenorFactor(tenorMonths: number) {
+  return Math.min(2, 1 + (tenorMonths - 1) * 0.08);
+}
+
+export function swapInitialMargin(notionalTonnes: number, fixedRate: number, underlyingMarginRate: number, tenorMonths: number) {
+  return notionalTonnes * fixedRate * underlyingMarginRate * swapTenorFactor(tenorMonths);
+}
+
+export function swapVariationMargin(notionalTonnes: number, fixedRate: number, floatingRate: number, side: "buy" | "sell") {
+  // side "buy" = pay-fixed (profits when the floating/market rate rises above the fixed rate)
+  const d = (floatingRate - fixedRate) * notionalTonnes;
+  return side === "buy" ? d : -d;
+}
+
 /**
  * Simplified SPAN-style scanning-risk margin for an options leg: reprices
  * the position across a grid of futures-price and volatility shocks and

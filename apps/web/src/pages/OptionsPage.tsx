@@ -27,6 +27,7 @@ export default function OptionsPage() {
   const [side, setSide] = useState<Side>("buy");
   const [qty, setQty] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [showPricing, setShowPricing] = useState(false);
 
   const future = FUTURES[sel];
   const quote = quotes[`${sel}:${maturity}`];
@@ -167,6 +168,25 @@ export default function OptionsPage() {
           )}
         </Panel>
       </div>
+
+      <Panel
+        title={t.options.pricingTitle}
+        right={
+          <button onClick={() => setShowPricing((v) => !v)} style={{ background: "transparent", border: `1px solid ${T.line}`, borderRadius: 4, padding: "4px 10px", fontSize: 11, color: T.muted, fontFamily: "inherit" }}>
+            {showPricing ? "▲" : "▼"}
+          </button>
+        }
+      >
+        {showPricing ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 12.5, color: T.muted, lineHeight: 1.6 }}>
+            <p style={{ margin: 0 }}>{t.options.pricingIntro}</p>
+            <p style={{ margin: 0 }}>{t.options.pricingInputs}</p>
+            <p style={{ margin: 0, color: T.warn }}>{t.options.pricingAssumption}</p>
+          </div>
+        ) : (
+          <div style={{ fontSize: 12.5, color: T.faint }}>{t.options.pricingIntro}</div>
+        )}
+      </Panel>
     </div>
   );
 }

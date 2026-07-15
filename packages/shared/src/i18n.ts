@@ -26,10 +26,13 @@ export interface Dict {
   tabs: {
     markets: string;
     options: string;
+    swaps: string;
     etf: string;
     trade: string;
     portfolio: string;
     specs: string;
+    marketData: string;
+    participants: string;
     compliance: string;
     help: string;
   };
@@ -104,6 +107,22 @@ export interface Dict {
     puts: string;
     underlyingFuture: string;
     model: string;
+    pricingTitle: string;
+    pricingIntro: string;
+    pricingInputs: string;
+    pricingAssumption: string;
+  };
+  swap: {
+    title: string;
+    payFixed: string;
+    receiveFixed: string;
+    tenor: string;
+    months: string;
+    notional: string;
+    fixedRate: string;
+    floatingRate: string;
+    referenceMaturity: string;
+    mechanism: string;
   };
   portfolio: {
     cash: string;
@@ -141,6 +160,30 @@ export interface Dict {
     investTxt: string;
     warn: string;
   };
+  marketData: {
+    title: string;
+    historicalTitle: string;
+    historicalTxt: string;
+    apiTitle: string;
+    apiTxt: string;
+    tiersTitle: string;
+    tiers: { name: string; latency: string; price: string }[];
+    endpointsTitle: string;
+    paymentTitle: string;
+    paymentMethods: string[];
+    providersTitle: string;
+    providersTxt: string;
+    providers: string[];
+  };
+  participants: {
+    title: string;
+    usersTitle: string;
+    usersTxt: string;
+    usersSteps: string[];
+    regulatorsTitle: string;
+    regulatorsTxt: string;
+    regulatorsPoints: string[];
+  };
   footer: string;
 }
 
@@ -153,7 +196,7 @@ export const I18N: Record<Lang, Dict> = {
     session: "Séance ouverte — 09:00–14:30 (Tunis)",
     clearing: "Compensation (simulée) : CCE Clearing",
     ccy: "Cotation : TND — dinar tunisien",
-    tabs: { markets: "Marchés", options: "Options", etf: "ETF", trade: "Négociation", portfolio: "Portefeuille", specs: "Spécifications", compliance: "Conformité & CMF", help: "Assistance" },
+    tabs: { markets: "Marchés", options: "Options", swaps: "Swaps", etf: "ETF", trade: "Négociation", portfolio: "Portefeuille", specs: "Spécifications", marketData: "Données & API", participants: "Participants", compliance: "Conformité & CMF", help: "Assistance" },
     common: {
       last: "Dernier", chg: "Var.", settle: "Liquidation", vol: "Volume (lots)", oi: "Positions ouvertes", high: "Plus haut", low: "Plus bas",
       buy: "Achat", sell: "Vente", qty: "Quantité", price: "Prix", time: "Heure", status: "Statut", book: "Carnet d'ordres", side: "Sens", submit: "Transmettre", cancel: "Annuler",
@@ -180,7 +223,25 @@ export const I18N: Record<Lang, Dict> = {
       fee: "Frais de gestion annuels", subscribe: "Souscrire", redeem: "Racheter", units: "Parts",
       mechanism: "Souscription/rachat en nature par blocs de création, réservés aux participants autorisés ; négociation continue en parts sur le marché secondaire.",
     },
-    options: { chain: "Chaîne d'options", calls: "Calls", puts: "Puts", underlyingFuture: "Sous-jacent (contrat à terme)", model: "Modèle Black-76 sur prix à terme" },
+    options: {
+      chain: "Chaîne d'options", calls: "Calls", puts: "Puts", underlyingFuture: "Sous-jacent (contrat à terme)", model: "Modèle Black-76 sur prix à terme",
+      pricingTitle: "Méthodologie de valorisation",
+      pricingIntro: "Les options cotées sont des options européennes sur contrat à terme, valorisées par le modèle Black-76 (Black, 1976), l'extension du modèle Black-Scholes aux options sur prix à terme plutôt que sur un actif au comptant.",
+      pricingInputs: "Variables : prix à terme courant (F), prix d'exercice (K), échéance résiduelle (T), taux d'actualisation (r) et volatilité implicite (σ). Les grecques (delta, gamma, vega, theta) sont dérivées analytiquement du même modèle.",
+      pricingAssumption: "Simplification du prototype : volatilité constante par sous-jacent (non dérivée d'un marché d'options réel, car aucun n'existe aujourd'hui) et taux d'actualisation plat. Un marché réel utiliserait une surface de volatilité calibrée sur les prix cotés.",
+    },
+    swap: {
+      title: "Swaps de matières premières",
+      payFixed: "Payeur du fixe",
+      receiveFixed: "Receveur du fixe",
+      tenor: "Durée",
+      months: "mois",
+      notional: "Notionnel",
+      fixedRate: "Taux fixe",
+      floatingRate: "Taux flottant (référence)",
+      referenceMaturity: "Échéance de référence",
+      mechanism: "Swap compensé central à jambe unique : une partie paie un prix fixe et reçoit le prix de règlement flottant du contrat à terme sous-jacent à l'échéance la plus proche de la durée choisie (et inversement). Aucune livraison physique ; réévaluation quotidienne comme un contrat à terme.",
+    },
     portfolio: {
       cash: "Avoirs (compte espèces TND)", usedMargin: "Dépôts de garantie mobilisés", pnl: "Résultat latent (jour)", positions: "Positions ouvertes", entry: "Prix d'entrée",
       marginCall: "Un appel de marge est émis si la couverture devient insuffisante (J+1, 10:00).", noCall: "Aucun appel de marge en cours.",
@@ -203,6 +264,56 @@ export const I18N: Record<Lang, Dict> = {
       investTxt: "Dans un environnement réel : fonds de garantie de marché alimenté par les adhérents compensateurs, ségrégation des avoirs clients chez le dépositaire, publication quotidienne des prix de liquidation et positions ouvertes, conservation des ordres dix ans à des fins de surveillance.",
       warn: "Point d'attention : aucun compartiment de contrats à terme sur marchandises n'est aujourd'hui opérationnel en Tunisie. Le lancement effectif suppose un agrément et un cadre dédié approuvés par le CMF, l'articulation avec la BCT et les organismes de filière (ONH, GIFruits).",
     },
+    marketData: {
+      title: "Données de marché & API",
+      historicalTitle: "Données historiques",
+      historicalTxt: "Prix de règlement quotidiens simulés, disponibles à l'écran et par export. Dans un environnement réel, l'historique proviendrait du Bulletin officiel de la Bourse (archives réglementaires, dix ans de conservation).",
+      apiTitle: "Portail développeurs — utilisateurs abonnés",
+      apiTxt: "Accès réservé aux comptes enregistrés et validés (KYC), soumis à une convention de redistribution des données (market data agreement). Transport TLS 1.3, authentification Bearer, quotas par palier.",
+      tiersTitle: "Paliers d'accès",
+      tiers: [
+        { name: "Différé (15 min)", latency: "Retard 15 min, REST uniquement", price: "Gratuit — compte enregistré" },
+        { name: "Temps réel", latency: "REST + WebSocket temps réel", price: "Abonnement mensuel" },
+        { name: "Historique en gros", latency: "Export en masse, archives complètes", price: "Sur devis — professionnels" },
+      ],
+      endpointsTitle: "Points d'accès REST v1 (exemples)",
+      paymentTitle: "Moyens de paiement (abonnements & frais)",
+      paymentMethods: [
+        "Virement bancaire (compte séquestre dépositaire)",
+        "Prélèvement automatique — mandat SEPA/local",
+        "Carte bancaire (paiement en ligne sécurisé)",
+        "Compensation directe sur compte espèces TND de l'intermédiaire",
+      ],
+      providersTitle: "Fournisseurs et diffuseurs de données",
+      providersTxt: "Exemples illustratifs du type de partenaires de diffusion qu'une bourse réelle solliciterait — aucun accord réel n'existe avec les entités ci-dessous ; ce ne sont pas des partenaires de CCE.",
+      providers: [
+        "Diffuseur financier régional (agrégateur de flux boursiers)",
+        "Fournisseur de terminaux de marché (type Bloomberg/Refinitiv, à titre d'exemple)",
+        "Médias économiques locaux (rediffusion des prix de clôture)",
+        "Fournisseur de données historiques / recherche académique",
+      ],
+    },
+    participants: {
+      title: "Participants au marché",
+      usersTitle: "Pour les utilisateurs (traders & membres)",
+      usersTxt: "Toute personne physique ou morale souhaitant négocier doit passer par un intermédiaire en bourse agréé.",
+      usersSteps: [
+        "Signature d'une convention avec un intermédiaire en bourse agréé",
+        "Questionnaire d'adéquation (profil de risque, connaissance des instruments dérivés)",
+        "Dossier KYC/LBC-FT — pièce d'identité, RNE pour les personnes morales, bénéficiaires effectifs",
+        "Remise et accusé de réception de la note d'information visée par le CMF",
+        "Dépôt initial de garantie avant toute négociation",
+      ],
+      regulatorsTitle: "Pour les régulateurs",
+      regulatorsTxt: "Le Conseil du Marché Financier (CMF) exercerait la surveillance prudentielle et comportementale d'une bourse de matières premières réelle, avec accès direct aux données de marché et à la piste d'audit.",
+      regulatorsPoints: [
+        "Accès en lecture aux carnets d'ordres, transactions et positions ouvertes en temps réel",
+        "Piste d'audit complète des ordres et communications, conservée dix ans",
+        "Rapports réglementaires périodiques (positions importantes, incidents de marché)",
+        "Pouvoir de suspension et d'enquête en cas de manipulation de cours ou d'opération d'initié",
+        "Coordination avec la Banque Centrale de Tunisie (régime des changes) et la CTAF (LBC-FT)",
+      ],
+    },
     footer: "CCE — prototype de démonstration réalisé à des fins d'étude. Ne constitue ni une offre de services d'investissement, ni une plateforme agréée par le CMF, ni un conseil en investissement. Cotations simulées.",
   },
   en: {
@@ -213,7 +324,7 @@ export const I18N: Record<Lang, Dict> = {
     session: "Session open — 09:00–14:30 (Tunis)",
     clearing: "Clearing (simulated): CCE Clearing",
     ccy: "Quotation: TND — Tunisian dinar",
-    tabs: { markets: "Markets", options: "Options", etf: "ETFs", trade: "Trading", portfolio: "Portfolio", specs: "Contract Specs", compliance: "Compliance", help: "Support" },
+    tabs: { markets: "Markets", options: "Options", swaps: "Swaps", etf: "ETFs", trade: "Trading", portfolio: "Portfolio", specs: "Contract Specs", marketData: "Data & API", participants: "Participants", compliance: "Compliance", help: "Support" },
     common: {
       last: "Last", chg: "Chg", settle: "Settlement", vol: "Volume (lots)", oi: "Open interest", high: "High", low: "Low",
       buy: "Buy", sell: "Sell", qty: "Quantity", price: "Price", time: "Time", status: "Status", book: "Order book", side: "Side", submit: "Submit", cancel: "Cancel",
@@ -240,7 +351,25 @@ export const I18N: Record<Lang, Dict> = {
       fee: "Annual management fee", subscribe: "Subscribe", redeem: "Redeem", units: "Units",
       mechanism: "In-kind creation/redemption in baskets, reserved to authorized participants; continuous secondary-market trading in units.",
     },
-    options: { chain: "Options chain", calls: "Calls", puts: "Puts", underlyingFuture: "Underlying (futures contract)", model: "Black-76 model on the futures price" },
+    options: {
+      chain: "Options chain", calls: "Calls", puts: "Puts", underlyingFuture: "Underlying (futures contract)", model: "Black-76 model on the futures price",
+      pricingTitle: "Pricing methodology",
+      pricingIntro: "Listed options are European options on a futures contract, priced with the Black-76 model (Black, 1976) — the extension of Black-Scholes to options on a forward/futures price rather than a spot asset.",
+      pricingInputs: "Inputs: current futures price (F), strike (K), time to expiry (T), discount rate (r) and implied volatility (σ). The Greeks (delta, gamma, vega, theta) are derived analytically from the same model.",
+      pricingAssumption: "Prototype simplification: a flat volatility per underlying (not derived from a real options market, since none exists today) and a flat discount rate. A real market would use a volatility surface calibrated to quoted prices.",
+    },
+    swap: {
+      title: "Commodity swaps",
+      payFixed: "Pay fixed",
+      receiveFixed: "Receive fixed",
+      tenor: "Tenor",
+      months: "months",
+      notional: "Notional",
+      fixedRate: "Fixed rate",
+      floatingRate: "Floating rate (reference)",
+      referenceMaturity: "Reference maturity",
+      mechanism: "Centrally-cleared, single-leg swap: one party pays a fixed price and receives the floating settlement price of the underlying future nearest the chosen tenor (and vice versa). No physical delivery; marked to market daily like a future.",
+    },
     portfolio: {
       cash: "Cash balance (TND account)", usedMargin: "Margin on deposit", pnl: "Unrealized P&L (day)", positions: "Open positions", entry: "Entry price",
       marginCall: "A margin call is issued if collateral becomes insufficient (T+1, 10:00).", noCall: "No margin call outstanding.",
@@ -263,6 +392,56 @@ export const I18N: Record<Lang, Dict> = {
       investTxt: "In a real environment: market guarantee fund funded by clearing members, client asset segregation at the depository, daily publication of settlement prices and open interest, orders kept ten years for market surveillance.",
       warn: "Attention: no commodity futures segment is currently operational in Tunisia. A live launch requires CMF authorization and a dedicated framework, coordination with the BCT, and agreements with sector bodies (ONH, GIFruits).",
     },
+    marketData: {
+      title: "Market Data & API",
+      historicalTitle: "Historical data",
+      historicalTxt: "Simulated daily settlement prices, viewable on-screen and exportable. In a real environment, the archive would come from the exchange's official bulletin (regulatory records, ten-year retention).",
+      apiTitle: "Developer portal — subscribed users",
+      apiTxt: "Access restricted to registered, KYC-validated accounts, subject to a market data redistribution agreement. TLS 1.3 transport, Bearer authentication, per-tier quotas.",
+      tiersTitle: "Access tiers",
+      tiers: [
+        { name: "Delayed (15 min)", latency: "15-minute delay, REST only", price: "Free — registered account" },
+        { name: "Real-time", latency: "REST + real-time WebSocket", price: "Monthly subscription" },
+        { name: "Bulk historical", latency: "Bulk export, full archive", price: "Quote-based — professional" },
+      ],
+      endpointsTitle: "REST v1 endpoints (examples)",
+      paymentTitle: "Payment methods (subscriptions & fees)",
+      paymentMethods: [
+        "Bank transfer (depository escrow account)",
+        "Direct debit — SEPA/local mandate",
+        "Card payment (secure online checkout)",
+        "Direct offset against the broker's TND cash account",
+      ],
+      providersTitle: "Data providers & redistributors",
+      providersTxt: "Illustrative examples of the kind of redistribution partners a real exchange would work with — no real agreement exists with the entities below; they are not partners of CCE.",
+      providers: [
+        "Regional financial data aggregator",
+        "Market-data terminal vendor (e.g. Bloomberg/Refinitiv-style, illustrative only)",
+        "Local financial media (closing-price rebroadcast)",
+        "Historical data / academic research provider",
+      ],
+    },
+    participants: {
+      title: "Market participants",
+      usersTitle: "For users (traders & members)",
+      usersTxt: "Any individual or legal entity wishing to trade must go through a licensed broker.",
+      usersSteps: [
+        "Sign an agreement with a licensed broker",
+        "Suitability questionnaire (risk profile, knowledge of derivatives)",
+        "KYC/AML file — ID, corporate registry for legal entities, beneficial owners",
+        "Receipt and acknowledgement of the CMF-approved information notice",
+        "Initial margin deposit before any trading",
+      ],
+      regulatorsTitle: "For regulators",
+      regulatorsTxt: "The Conseil du Marché Financier (CMF) would exercise prudential and conduct supervision of a real commodity exchange, with direct access to market data and the audit trail.",
+      regulatorsPoints: [
+        "Real-time read access to order books, trades, and open positions",
+        "Complete audit trail of orders and communications, kept ten years",
+        "Periodic regulatory reporting (large positions, market incidents)",
+        "Power to suspend trading and investigate price manipulation or insider dealing",
+        "Coordination with the Central Bank of Tunisia (exchange control) and CTAF (AML/CFT)",
+      ],
+    },
     footer: "CCE — demonstration prototype built for study purposes. Not an offer of investment services, not a CMF-licensed venue, not investment advice. Simulated quotes.",
   },
   ar: {
@@ -273,7 +452,7 @@ export const I18N: Record<Lang, Dict> = {
     session: "الحصّة مفتوحة — 09:00–14:30 (تونس)",
     clearing: "المقاصة (محاكاة): CCE Clearing",
     ccy: "التسعير: دينار تونسي (TND)",
-    tabs: { markets: "الأسواق", options: "الخيارات", etf: "صناديق المؤشرات", trade: "التداول", portfolio: "المحفظة", specs: "مواصفات العقود", compliance: "الامتثال وهيئة السوق المالية", help: "المساعدة" },
+    tabs: { markets: "الأسواق", options: "الخيارات", swaps: "المبادلات", etf: "صناديق المؤشرات", trade: "التداول", portfolio: "المحفظة", specs: "مواصفات العقود", marketData: "البيانات وواجهة API", participants: "المتعاملون", compliance: "الامتثال وهيئة السوق المالية", help: "المساعدة" },
     common: {
       last: "آخر سعر", chg: "التغيّر", settle: "سعر التسوية", vol: "الحجم (عقود)", oi: "المراكز المفتوحة", high: "الأعلى", low: "الأدنى",
       buy: "شراء", sell: "بيع", qty: "الكمية", price: "السعر", time: "الوقت", status: "الحالة", book: "دفتر الأوامر", side: "الاتجاه", submit: "إرسال", cancel: "إلغاء",
@@ -300,7 +479,25 @@ export const I18N: Record<Lang, Dict> = {
       fee: "رسوم التصرف السنوية", subscribe: "اكتتاب", redeem: "استرداد", units: "حصص",
       mechanism: "اكتتاب واسترداد عيني بحصص إنشاء، مخصص للمشاركين المعتمدين؛ تداول مستمر للحصص في السوق الثانوية.",
     },
-    options: { chain: "سلسلة الخيارات", calls: "خيارات الشراء", puts: "خيارات البيع", underlyingFuture: "الأصل الأساسي (عقد آجل)", model: "نموذج Black-76 على السعر الآجل" },
+    options: {
+      chain: "سلسلة الخيارات", calls: "خيارات الشراء", puts: "خيارات البيع", underlyingFuture: "الأصل الأساسي (عقد آجل)", model: "نموذج Black-76 على السعر الآجل",
+      pricingTitle: "منهجية التسعير",
+      pricingIntro: "الخيارات المدرجة هي خيارات أوروبية على عقد آجل، تُسعَّر بنموذج Black-76 (بلاك، 1976)، وهو امتداد لنموذج Black-Scholes على السعر الآجل بدلاً من الأصل الفوري.",
+      pricingInputs: "المتغيرات: السعر الآجل الحالي (F)، سعر التنفيذ (K)، المدة المتبقية حتى الاستحقاق (T)، معدل الخصم (r) والتقلب الضمني (σ). تُشتق اليونانيات (دلتا، غاما، فيغا، ثيتا) تحليليًا من نفس النموذج.",
+      pricingAssumption: "تبسيط النموذج التجريبي: تقلب ثابت لكل أصل أساسي (غير مستمد من سوق خيارات حقيقي لعدم وجوده حاليًا) ومعدل خصم ثابت. سيستعمل السوق الحقيقي سطح تقلب مُعايرًا وفق الأسعار المتداولة.",
+    },
+    swap: {
+      title: "مبادلات السلع",
+      payFixed: "دافع السعر الثابت",
+      receiveFixed: "قابض السعر الثابت",
+      tenor: "المدة",
+      months: "أشهر",
+      notional: "القيمة الاسمية",
+      fixedRate: "السعر الثابت",
+      floatingRate: "السعر المتغير (مرجعي)",
+      referenceMaturity: "الاستحقاق المرجعي",
+      mechanism: "مبادلة أحادية الجزء ذات مقاصة مركزية: يدفع طرف سعرًا ثابتًا ويقبض سعر التسوية المتغير لعقد آجل مرجعي أقرب لمدة المبادلة المختارة (والعكس صحيح). دون تسليم مادي؛ تُقيَّم يوميًا كعقد آجل.",
+    },
     portfolio: {
       cash: "الرصيد النقدي (حساب بالدينار)", usedMargin: "الهوامش المودعة", pnl: "الأرباح/الخسائر غير المحققة (اليوم)", positions: "المراكز المفتوحة", entry: "سعر الدخول",
       marginCall: "يُصدر نداء هامش إذا أصبحت الضمانات غير كافية (ت+1، 10:00).", noCall: "لا يوجد نداء هامش حاليًا.",
@@ -322,6 +519,56 @@ export const I18N: Record<Lang, Dict> = {
       kyc: "حالة الحساب — اعرف عميلك (محاكاة)", frame: "الإطار الترتيبي المرجعي", invest: "حماية المستثمر", docs: "الوثائق التعاقدية (نماذج)",
       investTxt: "في بيئة حقيقية: صندوق ضمان يموّله أعضاء المقاصة، فصل أصول الحرفاء لدى المودع، نشر يومي لأسعار التسوية والمراكز المفتوحة، حفظ الأوامر عشر سنوات.",
       warn: "تنبيه: لا يوجد اليوم قسم عملي للعقود الآجلة على السلع في تونس. يستوجب الإطلاق الفعلي ترخيصًا وإطارًا خاصًا من هيئة السوق المالية، والتنسيق مع البنك المركزي وهياكل القطاع.",
+    },
+    marketData: {
+      title: "بيانات السوق وواجهة API",
+      historicalTitle: "البيانات التاريخية",
+      historicalTxt: "أسعار تسوية يومية محاكاة، قابلة للعرض والتصدير. في بيئة حقيقية، تصدر الأرشيفات عن النشرة الرسمية للبورصة (سجلات رقابية، حفظ لعشر سنوات).",
+      apiTitle: "بوابة المطورين — للمستخدمين المشتركين",
+      apiTxt: "نفاذ مقتصر على الحسابات المسجّلة والمصادَق عليها (اعرف عميلك)، ويخضع لاتفاقية إعادة توزيع بيانات السوق. نقل TLS 1.3، مصادقة Bearer، وحصص حسب الفئة.",
+      tiersTitle: "فئات النفاذ",
+      tiers: [
+        { name: "مؤجل (15 دقيقة)", latency: "تأخير 15 دقيقة، REST فقط", price: "مجاني — حساب مسجّل" },
+        { name: "الوقت الفعلي", latency: "REST + بث WebSocket فوري", price: "اشتراك شهري" },
+        { name: "بيانات تاريخية بالجملة", latency: "تصدير جماعي، أرشيف كامل", price: "حسب الطلب — للمهنيين" },
+      ],
+      endpointsTitle: "نقاط نفاذ REST v1 (أمثلة)",
+      paymentTitle: "وسائل الدفع (الاشتراكات والرسوم)",
+      paymentMethods: [
+        "تحويل بنكي (حساب ضمان لدى المودع)",
+        "اقتطاع آلي — تفويض محلي",
+        "الدفع بالبطاقة البنكية (دفع إلكتروني آمن)",
+        "مقاصة مباشرة على الحساب النقدي بالدينار لدى الوسيط",
+      ],
+      providersTitle: "مزودو وموزعو البيانات",
+      providersTxt: "أمثلة توضيحية لنوعية شركاء النشر التي قد تتعامل معها بورصة حقيقية — لا يوجد أي اتفاق فعلي مع الجهات أدناه؛ وهي ليست شركاء لـCCE.",
+      providers: [
+        "مجمّع بيانات مالية إقليمي",
+        "مزود منصات بيانات السوق (على غرار Bloomberg/Refinitiv، لأغراض توضيحية فقط)",
+        "وسائل إعلام اقتصادية محلية (إعادة بث أسعار الإغلاق)",
+        "مزود بيانات تاريخية / بحث أكاديمي",
+      ],
+    },
+    participants: {
+      title: "المتعاملون في السوق",
+      usersTitle: "للمستخدمين (المتداولون والأعضاء)",
+      usersTxt: "على كل شخص طبيعي أو معنوي يرغب في التداول المرور عبر وسيط بورصة مرخّص.",
+      usersSteps: [
+        "إبرام اتفاقية مع وسيط بورصة مرخّص",
+        "استبيان الملاءمة (درجة تحمل المخاطر، معرفة الأدوات المشتقة)",
+        "ملف اعرف عميلك/مكافحة غسل الأموال — بطاقة تعريف، السجل الوطني للمؤسسات للأشخاص المعنويين، المستفيدون الفعليون",
+        "استلام والإقرار بنشرة المعلومات المؤشرة من هيئة السوق المالية",
+        "إيداع هامش ضمان أولي قبل أي تداول",
+      ],
+      regulatorsTitle: "للمنظمين",
+      regulatorsTxt: "تمارس هيئة السوق المالية (CMF) الرقابة الاحترازية والسلوكية على بورصة سلع حقيقية، مع نفاذ مباشر إلى بيانات السوق وسجل التدقيق.",
+      regulatorsPoints: [
+        "نفاذ بالقراءة في الوقت الفعلي إلى دفاتر الأوامر والصفقات والمراكز المفتوحة",
+        "سجل تدقيق كامل للأوامر والمراسلات، محفوظ عشر سنوات",
+        "تقارير رقابية دورية (المراكز الكبرى، حوادث السوق)",
+        "صلاحية إيقاف التداول والتحقيق في التلاعب بالأسعار أو استغلال المعلومات الامتيازية",
+        "التنسيق مع البنك المركزي التونسي (نظام الصرف) ولجنة التحاليل المالية (مكافحة غسل الأموال)",
+      ],
     },
     footer: "CCE — نموذج تجريبي أُنجز لأغراض الدراسة. لا يشكّل عرض خدمات استثمارية ولا منصة مرخّصة من هيئة السوق المالية ولا نصيحة استثمارية. أسعار محاكاة.",
   },

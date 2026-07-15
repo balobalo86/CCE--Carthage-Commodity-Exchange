@@ -1,4 +1,5 @@
-import type { EtfSpec, FutureContractSpec } from "./types";
+import { generateMaturities } from "./maturity";
+import type { EtfSpec, FutureContractSpec, SwapSpec } from "./types";
 
 export const COLORS = {
   olive: "#aebe45",
@@ -25,7 +26,10 @@ export const FUTURES: Record<string, FutureContractSpec> = {
     tick: 10,
     marginRate: 0.09,
     maintenanceRatio: 0.75,
-    maturities: ["SEP26", "NOV26", "JAN27", "MAR27", "MAI27"],
+    // Full monthly curve, 12 months out — olive oil is stored and traded
+    // year-round, so unlike dates there's continuous demand for a contract
+    // in every month rather than just around harvest.
+    maturities: generateMaturities(12, 1),
     grade: {
       fr: "Huile d'olive vierge extra, acidité ≤ 0,8 %, indice de peroxyde ≤ 20 — normes ONH / Conseil oléicole international, origine Tunisie, certificat d'analyse par laboratoire agréé.",
       en: "Extra virgin olive oil, free acidity ≤ 0.8 %, peroxide value ≤ 20 — ONH / International Olive Council standards, Tunisian origin, certificate of analysis from an accredited laboratory.",
@@ -44,6 +48,11 @@ export const FUTURES: Record<string, FutureContractSpec> = {
     posLimitNet: 400,
     posLimitFrontMonth: 150,
     rule: "Ch. 12 — Oléagineux / Olive Oil",
+    calendarNote: {
+      fr: "Courbe mensuelle complète (12 échéances consécutives). La récolte tunisienne (nov.–janv.) pèse sur les échéances de livraison rapprochées ; le report (contango) reflète le coût de stockage jusqu'à la campagne suivante.",
+      en: "Full monthly curve (12 consecutive maturities). The Tunisian harvest (Nov–Jan) weighs on the nearer delivery months; the contango further out reflects storage cost carried to the next crop year.",
+      ar: "منحنى شهري كامل (12 استحقاقًا متتاليًا). يؤثر موسم الحصاد التونسي (نوفمبر–جانفي) على الآجال القريبة للتسليم؛ يعكس تفاوت الأسعار (كونتانغو) في الآجال الأبعد تكلفة التخزين إلى الموسم المقبل.",
+    },
   },
   DGN: {
     code: "DGN",
@@ -59,7 +68,10 @@ export const FUTURES: Record<string, FutureContractSpec> = {
     tick: 5,
     marginRate: 0.11,
     maintenanceRatio: 0.75,
-    maturities: ["OCT26", "DEC26", "FEV27"],
+    // Bi-monthly, 12 months out — dates are a shorter, sharply seasonal
+    // harvest (Sept–Nov) so the market doesn't need a full monthly curve;
+    // real seasonal-ag futures (cotton, coffee) list active months this way.
+    maturities: generateMaturities(6, 2),
     grade: {
       fr: "Dattes Deglet Nour branchées, catégorie I, humidité ≤ 26 %, calibre ≥ 4 g — stations de conditionnement agréées GIFruits, régions Kébili / Tozeur.",
       en: "Deglet Nour dates on branch, Category I, moisture ≤ 26 %, unit weight ≥ 4 g — GIFruits-licensed packing stations, Kébili / Tozeur regions.",
@@ -78,6 +90,11 @@ export const FUTURES: Record<string, FutureContractSpec> = {
     posLimitNet: 600,
     posLimitFrontMonth: 200,
     rule: "Ch. 14 — Fruits / Dates",
+    calendarNote: {
+      fr: "Échéances bimestrielles (6 sur 12 mois). La récolte (sept.–nov.) concentre l'essentiel des volumes physiques ; le calendrier bimestriel suffit à couvrir la campagne sans échéances excédentaires peu liquides.",
+      en: "Bi-monthly maturities (6 across 12 months). The harvest (Sept–Nov) concentrates most physical volume; a bi-monthly calendar covers the marketing season without excess, thinly-traded maturities.",
+      ar: "آجال كل شهرين (6 استحقاقات على مدى 12 شهرًا). يتركز معظم الحجم الفعلي خلال موسم الحصاد (سبتمبر–نوفمبر)؛ يكفي تقويم كل شهرين لتغطية الموسم التجاري دون آجال زائدة قليلة السيولة.",
+    },
   },
 };
 
@@ -123,6 +140,47 @@ export const ETFS: Record<string, EtfSpec> = {
     managementFeeBps: 55,
     creationUnit: 100000,
     inceptionNav: 78.2,
+  },
+};
+
+export const SWAP_TENORS_MONTHS = [1, 3, 6, 12];
+
+export const SWAPS: Record<string, SwapSpec> = {
+  "HOV-SWAP": {
+    code: "HOV-SWAP",
+    assetClass: "swap",
+    accent: COLORS.olive,
+    name: {
+      fr: "Swap huile d'olive TND",
+      en: "Olive Oil TND Swap",
+      ar: "مبادلة زيت الزيتون بالدينار",
+    },
+    description: {
+      fr: "Swap de matières premières compensé central : une jambe fixe échangée contre le prix de règlement flottant du contrat à terme HOV à l'échéance la plus proche de la durée choisie. Utilisé pour figer un prix sans livraison physique ni roulement de positions à terme.",
+      en: "Centrally-cleared commodity swap: a fixed leg exchanged against the floating settlement price of the HOV future nearest the chosen tenor. Used to lock in a price without physical delivery or rolling futures positions.",
+      ar: "مبادلة سلعية مقاصتها مركزية: جزء ثابت مقابل سعر التسوية المتغير لعقد HOV الآجل الأقرب لمدة المبادلة المختارة. تُستعمل لتثبيت سعر دون تسليم مادي أو ترحيل مراكز آجلة.",
+    },
+    underlying: "HOV",
+    tenorsMonths: SWAP_TENORS_MONTHS,
+    rule: "Ch. 20 — Swaps de matières premières / Commodity Swaps",
+  },
+  "DGN-SWAP": {
+    code: "DGN-SWAP",
+    assetClass: "swap",
+    accent: COLORS.amber,
+    name: {
+      fr: "Swap dattes TND",
+      en: "Dates TND Swap",
+      ar: "مبادلة التمور بالدينار",
+    },
+    description: {
+      fr: "Swap de matières premières compensé central : une jambe fixe échangée contre le prix de règlement flottant du contrat à terme DGN à l'échéance la plus proche de la durée choisie.",
+      en: "Centrally-cleared commodity swap: a fixed leg exchanged against the floating settlement price of the DGN future nearest the chosen tenor.",
+      ar: "مبادلة سلعية مقاصتها مركزية: جزء ثابت مقابل سعر التسوية المتغير لعقد DGN الآجل الأقرب لمدة المبادلة المختارة.",
+    },
+    underlying: "DGN",
+    tenorsMonths: SWAP_TENORS_MONTHS,
+    rule: "Ch. 20 — Swaps de matières premières / Commodity Swaps",
   },
 };
 

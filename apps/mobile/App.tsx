@@ -9,6 +9,7 @@ import { MarketProvider } from "./src/lib/MarketContext";
 import { ToastProvider } from "./src/lib/ToastContext";
 import MarketsScreen from "./src/screens/MarketsScreen";
 import OptionsScreen from "./src/screens/OptionsScreen";
+import SwapsScreen from "./src/screens/SwapsScreen";
 import EtfScreen from "./src/screens/EtfScreen";
 import PortfolioScreen from "./src/screens/PortfolioScreen";
 import { T } from "./src/theme";
@@ -61,6 +62,7 @@ function Tabs() {
     >
       <Tab.Screen name="markets" component={MarketsScreen} options={{ title: t.tabs.markets }} />
       <Tab.Screen name="options" component={OptionsScreen} options={{ title: t.tabs.options }} />
+      <Tab.Screen name="swaps" component={SwapsScreen} options={{ title: t.tabs.swaps }} />
       <Tab.Screen name="etf" component={EtfScreen} options={{ title: t.tabs.etf }} />
       <Tab.Screen name="portfolio" component={PortfolioScreen} options={{ title: t.tabs.portfolio }} />
     </Tab.Navigator>

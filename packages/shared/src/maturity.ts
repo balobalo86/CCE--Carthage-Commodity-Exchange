@@ -32,3 +32,29 @@ export function maturityToExpiry(code: string): Date {
   }
   return d;
 }
+
+const MONTH_ABBR = ["JAN", "FEV", "MAR", "AVR", "MAI", "JUN", "JUL", "AOU", "SEP", "OCT", "NOV", "DEC"];
+
+function monthCode(monthIndex0: number, year: number): string {
+  const y = year + Math.floor(monthIndex0 / 12);
+  const m = ((monthIndex0 % 12) + 12) % 12;
+  return `${MONTH_ABBR[m]}${String(y % 100).padStart(2, "0")}`;
+}
+
+/**
+ * Rolling contract calendar: `count` maturities starting `startOffsetMonths`
+ * from now, every `stepMonths` months — e.g. stepMonths=1 gives a full
+ * monthly curve, stepMonths=2 gives a bi-monthly curve. Mirrors how real
+ * agricultural futures list a rolling window of active months rather than a
+ * fixed set, and lets each commodity's contract calendar reflect its own
+ * harvest/marketing cycle instead of sharing one schedule.
+ */
+export function generateMaturities(count: number, stepMonths = 1, startOffsetMonths = 1, from: Date = new Date()): string[] {
+  const baseMonth = from.getUTCMonth();
+  const baseYear = from.getUTCFullYear();
+  const out: string[] = [];
+  for (let i = 0; i < count; i++) {
+    out.push(monthCode(baseMonth + startOffsetMonths + i * stepMonths, baseYear));
+  }
+  return out;
+}

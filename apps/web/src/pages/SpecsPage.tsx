@@ -64,6 +64,7 @@ export default function SpecsPage() {
               ))}
             </tbody>
           </table>
+          <div style={{ marginTop: 12, fontSize: 12, color: T.muted, lineHeight: 1.6 }}>{ct.calendarNote[lang]}</div>
         </Panel>
       ))}
     </div>

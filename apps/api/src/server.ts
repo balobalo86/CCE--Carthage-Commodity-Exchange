@@ -2,7 +2,7 @@ import cors from "cors";
 import express from "express";
 import { createServer } from "node:http";
 import { WebSocketServer } from "ws";
-import { ETFS, FUTURES } from "@cce/shared";
+import { ETFS, FUTURES, SWAPS } from "@cce/shared";
 import { engine } from "./engine.js";
 
 const PORT = Number(process.env.PORT ?? 4000);
@@ -16,7 +16,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.get("/api/contracts", (_req, res) => {
-  res.json({ futures: FUTURES, etfs: ETFS });
+  res.json({ futures: FUTURES, etfs: ETFS, swaps: SWAPS });
 });
 
 app.get("/api/markets", (_req, res) => {
@@ -35,6 +35,13 @@ app.get("/api/markets/:code/:maturity/book", (req, res) => {
   res.json(book);
 });
 
+app.get("/api/markets/:code/:maturity/history", (req, res) => {
+  const days = req.query.days ? Math.min(365, Math.max(1, Number(req.query.days))) : 90;
+  const history = engine.getDailyHistory(req.params.code, req.params.maturity, days);
+  if (!history) return res.status(404).json({ error: "Unknown contract or maturity." });
+  res.json(history);
+});
+
 app.get("/api/options/:code/:maturity/chain", (req, res) => {
   const width = req.query.width ? Number(req.query.width) : 5;
   const chain = engine.getOptionChain(req.params.code, req.params.maturity, width);
@@ -50,6 +57,21 @@ app.get("/api/etf/:code", (req, res) => {
   const quote = engine.getEtfQuote(req.params.code);
   if (!quote) return res.status(404).json({ error: "Unknown ETF." });
   res.json({ spec: ETFS[req.params.code], quote });
+});
+
+app.get("/api/swaps", (_req, res) => {
+  res.json(
+    Object.keys(SWAPS).map((code) => ({
+      spec: SWAPS[code],
+      quotes: SWAPS[code].tenorsMonths.map((tenorMonths) => engine.getSwapQuote(code, tenorMonths)),
+    }))
+  );
+});
+
+app.get("/api/swaps/:code/:tenor", (req, res) => {
+  const quote = engine.getSwapQuote(req.params.code, Number(req.params.tenor));
+  if (!quote) return res.status(404).json({ error: "Unknown swap or tenor." });
+  res.json(quote);
 });
 
 app.post("/api/accounts/:id/ack", (req, res) => {
@@ -79,6 +101,13 @@ app.post("/api/orders/etf", (req, res) => {
   const { accountId = "demo", code, side, units } = req.body ?? {};
   if (!code || !side || !units) return res.status(400).json({ error: "Missing required fields." });
   const order = engine.submitEtfOrder(accountId, code, side, Number(units));
+  res.json(order);
+});
+
+app.post("/api/orders/swap", (req, res) => {
+  const { accountId = "demo", code, tenorMonths, side, qty } = req.body ?? {};
+  if (!code || !tenorMonths || !side || !qty) return res.status(400).json({ error: "Missing required fields." });
+  const order = engine.submitSwapOrder(accountId, code, Number(tenorMonths), side, Number(qty));
   res.json(order);
 });
 

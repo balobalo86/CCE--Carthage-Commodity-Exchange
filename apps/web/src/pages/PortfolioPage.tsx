@@ -1,4 +1,4 @@
-import { FUTURES, ETFS } from "@cce/shared";
+import { FUTURES, ETFS, SWAPS } from "@cce/shared";
 import { Panel, Row } from "../components/Atoms";
 import { T } from "../theme";
 import { useAccount } from "../lib/useAccount";
@@ -13,11 +13,12 @@ export default function PortfolioPage() {
   const label = (p: any) => {
     if (p.assetClass === "future") return `${p.code} — ${FUTURES[p.code].name[lang]} (${p.maturity})`;
     if (p.assetClass === "option") return `${p.code} ${p.optionType.toUpperCase()} ${p.strike} (${p.maturity})`;
+    if (p.assetClass === "swap") return `${p.code} — ${SWAPS[p.code].name[lang]} (${p.tenorMonths}${t.swap.months})`;
     return `${p.code} — ${ETFS[p.code].name[lang]}`;
   };
-  const entryLabel = (p: any) => (p.assetClass === "etf" ? p.entryNav : p.assetClass === "option" ? p.entryPremium : p.entryPx);
-  const qtyLabel = (p: any) => (p.assetClass === "etf" ? p.units : p.lots);
-  const sideLabel = (p: any) => (p.assetClass === "etf" ? "—" : p.side === "buy" ? t.common.buy : t.common.sell);
+  const entryLabel = (p: any) => (p.assetClass === "etf" ? p.entryNav : p.assetClass === "option" ? p.entryPremium : p.assetClass === "swap" ? p.fixedRate : p.entryPx);
+  const qtyLabel = (p: any) => (p.assetClass === "etf" ? p.units : p.assetClass === "swap" ? `${p.notionalTonnes} t` : p.lots);
+  const sideLabel = (p: any) => (p.assetClass === "etf" ? "—" : p.assetClass === "swap" ? (p.side === "buy" ? t.swap.payFixed : t.swap.receiveFixed) : p.side === "buy" ? t.common.buy : t.common.sell);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>

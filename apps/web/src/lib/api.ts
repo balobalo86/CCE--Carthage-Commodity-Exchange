@@ -24,6 +24,9 @@ export const api = {
     req<any[]>(`/api/options/${code}/${maturity}/chain?width=${width}`),
   etfs: () => req<{ spec: any; quote: any }[]>("/api/etf"),
   etf: (code: string) => req<{ spec: any; quote: any }>(`/api/etf/${code}`),
+  swaps: () => req<{ spec: any; quotes: any[] }[]>("/api/swaps"),
+  swap: (code: string, tenorMonths: number) => req<any>(`/api/swaps/${code}/${tenorMonths}`),
+  history: (code: string, maturity: string, days = 90) => req<{ date: string; settle: number }[]>(`/api/markets/${code}/${maturity}/history?days=${days}`),
   portfolio: (accountId = ACCOUNT_ID) => req<any>(`/api/accounts/${accountId}/portfolio`),
   setAck: (ack: boolean, accountId = ACCOUNT_ID) =>
     req<{ id: string; ackOnFile: boolean }>(`/api/accounts/${accountId}/ack`, {
@@ -36,4 +39,6 @@ export const api = {
     req<Order>("/api/orders/option", { method: "POST", body: JSON.stringify({ accountId: ACCOUNT_ID, ...input }) }),
   submitEtf: (input: { code: string; side: "subscribe" | "redeem"; units: number }) =>
     req<Order>("/api/orders/etf", { method: "POST", body: JSON.stringify({ accountId: ACCOUNT_ID, ...input }) }),
+  submitSwap: (input: { code: string; tenorMonths: number; side: Side; qty: number }) =>
+    req<Order>("/api/orders/swap", { method: "POST", body: JSON.stringify({ accountId: ACCOUNT_ID, ...input }) }),
 };

@@ -9,9 +9,12 @@ import { Chip } from "./Atoms";
 const NAV_ITEMS: { key: keyof ReturnType<typeof useLang>["t"]["tabs"]; to: string }[] = [
   { key: "markets", to: "/" },
   { key: "options", to: "/options" },
+  { key: "swaps", to: "/swaps" },
   { key: "etf", to: "/etf" },
   { key: "portfolio", to: "/portfolio" },
   { key: "specs", to: "/specs" },
+  { key: "marketData", to: "/market-data" },
+  { key: "participants", to: "/participants" },
   { key: "compliance", to: "/compliance" },
   { key: "help", to: "/help" },
 ];

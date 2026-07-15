@@ -7,6 +7,9 @@ import {
   maturityToExpiry,
   priceBand,
   spanScenarioMargin,
+  SWAPS,
+  swapInitialMargin,
+  swapVariationMargin,
   yearsBetween,
   type Account,
   type FuturePosition,
@@ -18,6 +21,8 @@ import {
   type EtfPosition,
   type RiskReasonCode,
   type Side,
+  type SwapPosition,
+  type SwapQuote,
 } from "@cce/shared";
 import { OrderBook } from "./orderBook.js";
 import { checkAck, checkBand, checkFatFinger, checkMarginAvailable, checkPositionLimit } from "./riskEngine.js";
@@ -151,6 +156,66 @@ class Engine {
     return { code: etfCode, nav, basket: +basket.toFixed(2), chgPct: +(((nav - etf.inceptionNav) / etf.inceptionNav) * 100).toFixed(2), ts: Date.now() };
   }
 
+  /** Picks the listed futures maturity whose expiry is closest to now + tenorMonths. */
+  private nearestMaturityForTenor(underlyingCode: string, tenorMonths: number): string {
+    const future = FUTURES[underlyingCode];
+    const targetMs = Date.now() + tenorMonths * 30.44 * 24 * 3600 * 1000;
+    let best = future.maturities[0];
+    let bestDiff = Infinity;
+    for (const m of future.maturities) {
+      const diff = Math.abs(maturityToExpiry(m).getTime() - targetMs);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        best = m;
+      }
+    }
+    return best;
+  }
+
+  getSwapQuote(swapCode: string, tenorMonths: number): SwapQuote | null {
+    const swap = SWAPS[swapCode];
+    if (!swap) return null;
+    const referenceMaturity = this.nearestMaturityForTenor(swap.underlying, tenorMonths);
+    const q = this.getQuote(swap.underlying, referenceMaturity);
+    if (!q) return null;
+    return {
+      code: swapCode as any,
+      underlying: swap.underlying,
+      tenorMonths,
+      referenceMaturity,
+      fixedRate: q.last,
+      ts: Date.now(),
+    };
+  }
+
+  /**
+   * Simulated daily settlement series for the historical-data rubric. This
+   * process has no real trading history to draw on, so it synthesizes a
+   * plausible daily-close random walk ending at the current reference price
+   * — clearly a demo substitute, not a real archive (see docs/ARCHITECTURE.md).
+   */
+  getDailyHistory(code: string, maturity: string, days: number) {
+    const q = this.getQuote(code, maturity);
+    const future = FUTURES[code];
+    if (!q || !future) return null;
+    const seed = [...code + maturity].reduce((s, c) => s + c.charCodeAt(0), 0);
+    let rand = seed;
+    const next = () => {
+      rand = (rand * 1103515245 + 12345) & 0x7fffffff;
+      return rand / 0x7fffffff;
+    };
+    const out: { date: string; settle: number }[] = [];
+    let p = q.ref * (1 - 0.02 - next() * 0.03);
+    const now = Date.now();
+    for (let i = days; i >= 0; i--) {
+      p = Math.max(future.tick, p + (next() - 0.47) * q.ref * 0.006);
+      const d = new Date(now - i * 24 * 3600 * 1000);
+      out.push({ date: d.toISOString().slice(0, 10), settle: roundToTick(p, future.tick) });
+    }
+    out[out.length - 1].settle = q.ref;
+    return out;
+  }
+
   getOrCreateAccount(id: string): Account {
     let acc = this.accounts.get(id);
     if (!acc) {
@@ -194,6 +259,11 @@ class Engine {
         const T = yearsBetween(Date.now(), maturityToExpiry(pos.maturity).getTime());
         const span = spanScenarioMargin(pos.optionType, pos.side, pos.lots, future.tonnes, q.last, pos.strike, T, RISK_FREE_RATE, sigma, pos.entryPremium);
         total += span.scanningRisk;
+      } else if (pos.assetClass === "swap") {
+        const future = FUTURES[pos.underlying];
+        const swapQ = this.getSwapQuote(pos.code, pos.tenorMonths);
+        if (!future || !swapQ) continue;
+        total += swapInitialMargin(pos.notionalTonnes, swapQ.fixedRate, future.marginRate, pos.tenorMonths);
       }
     }
     return total;
@@ -217,6 +287,10 @@ class Engine {
         const eq = this.getEtfQuote(pos.code);
         if (!eq) continue;
         total += (eq.nav - pos.entryNav) * pos.units;
+      } else if (pos.assetClass === "swap") {
+        const swapQ = this.getSwapQuote(pos.code, pos.tenorMonths);
+        if (!swapQ) continue;
+        total += swapVariationMargin(pos.notionalTonnes, pos.fixedRate, swapQ.fixedRate, pos.side);
       }
     }
     return total;
@@ -361,6 +435,36 @@ class Engine {
     return order;
   }
 
+  submitSwapOrder(accountId: string, swapCode: string, tenorMonths: number, side: Side, qty: number): Order {
+    const account = this.getOrCreateAccount(accountId);
+    const swap = SWAPS[swapCode];
+    const swapQ = swap ? this.getSwapQuote(swapCode, tenorMonths) : null;
+    const reject = (message: string, reasonCode: RiskReasonCode) => {
+      const order: Order = { id: nextOrderId(), accountId, assetClass: "swap", code: swapCode, tenorMonths, side, kind: "market", qty, status: "rejected", rejectReason: `${reasonCode}: ${message}`, reasonCode, ts: Date.now() };
+      account.orders.unshift(order);
+      return order;
+    };
+    if (!swap || !swapQ || !swap.tenorsMonths.includes(tenorMonths)) return reject("Unknown swap or tenor.", "UNKNOWN");
+
+    const ack = checkAck(account);
+    if (!ack.ok) return reject(ack.message!, ack.reasonCode!);
+    const ff = checkFatFinger(qty);
+    if (!ff.ok) return reject(ff.message!, ff.reasonCode!);
+
+    const future = FUTURES[swap.underlying];
+    const notionalTonnes = future.tonnes * qty;
+    const margin = swapInitialMargin(notionalTonnes, swapQ.fixedRate, future.marginRate, tenorMonths);
+    const available = account.cashTnd - this.computeUsedMargin(account);
+    const marginCheck = checkMarginAvailable(available, margin);
+    if (!marginCheck.ok) return reject(marginCheck.message!, marginCheck.reasonCode!);
+
+    const order: Order = { id: nextOrderId(), accountId, assetClass: "swap", code: swapCode, tenorMonths, side, kind: "market", qty, status: "filled", fillPx: swapQ.fixedRate, ts: Date.now() };
+    account.orders.unshift(order);
+    const position: SwapPosition = { assetClass: "swap", code: swapCode as any, underlying: swap.underlying, tenorMonths, side, notionalTonnes, fixedRate: swapQ.fixedRate };
+    account.positions.push(position);
+    return order;
+  }
+
   private enrichPositions(account: Account) {
     return account.positions.map((pos, idx) => {
       if (pos.assetClass === "future") {
@@ -376,6 +480,12 @@ class Engine {
         const markPx = oq?.premium ?? pos.entryPremium;
         const d = (markPx - pos.entryPremium) * future.tonnes * pos.lots;
         return { ...pos, idx, markPx, unrealizedPnl: +(pos.side === "buy" ? d : -d).toFixed(2) };
+      }
+      if (pos.assetClass === "swap") {
+        const swapQ = this.getSwapQuote(pos.code, pos.tenorMonths);
+        const markPx = swapQ?.fixedRate ?? pos.fixedRate;
+        const unrealizedPnl = swapQ ? swapVariationMargin(pos.notionalTonnes, pos.fixedRate, markPx, pos.side) : 0;
+        return { ...pos, idx, markPx, unrealizedPnl: +unrealizedPnl.toFixed(2) };
       }
       const eq = this.getEtfQuote(pos.code);
       const markPx = eq?.nav ?? pos.entryNav;

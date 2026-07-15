@@ -2,10 +2,11 @@ export type Lang = "fr" | "en" | "ar";
 
 export type FutureCode = "HOV" | "DGN";
 export type EtfCode = "OLEA" | "TEMR";
+export type SwapCode = "HOV-SWAP" | "DGN-SWAP";
 export type Side = "buy" | "sell";
 export type OrderKind = "limit" | "market";
 export type OptionType = "call" | "put";
-export type AssetClass = "future" | "etf" | "option";
+export type AssetClass = "future" | "etf" | "option" | "swap";
 
 export interface LocalizedText {
   fr: string;
@@ -29,6 +30,18 @@ export interface FutureContractSpec {
   posLimit: LocalizedText;
   posLimitNet: number;
   posLimitFrontMonth: number;
+  rule: string;
+  calendarNote: LocalizedText;
+}
+
+export interface SwapSpec {
+  code: SwapCode;
+  assetClass: "swap";
+  accent: string;
+  name: LocalizedText;
+  description: LocalizedText;
+  underlying: FutureCode;
+  tenorsMonths: number[];
   rule: string;
 }
 
@@ -95,16 +108,17 @@ export interface Order {
   id: string;
   accountId: string;
   assetClass: AssetClass;
-  code: string; // future/ETF/option code
+  code: string; // future/ETF/option/swap code
   maturity?: string;
   strike?: number;
   optionType?: OptionType;
-  side: Side;
+  tenorMonths?: number; // swaps only
+  side: Side; // swaps: "buy" = pay-fixed, "sell" = receive-fixed
   kind: OrderKind;
   qty: number;
   limitPx?: number;
   status: "filled" | "rejected";
-  fillPx?: number;
+  fillPx?: number; // swaps: the fixed rate agreed (TND/tonne)
   rejectReason?: string;
   reasonCode?: RiskReasonCode;
   ts: number;
@@ -137,7 +151,17 @@ export interface OptionPosition {
   entryPremium: number;
 }
 
-export type Position = FuturePosition | EtfPosition | OptionPosition;
+export interface SwapPosition {
+  assetClass: "swap";
+  code: SwapCode;
+  underlying: FutureCode;
+  tenorMonths: number;
+  side: Side; // "buy" = pay-fixed, "sell" = receive-fixed
+  notionalTonnes: number;
+  fixedRate: number; // TND/tonne, locked at inception
+}
+
+export type Position = FuturePosition | EtfPosition | OptionPosition | SwapPosition;
 
 export interface Account {
   id: string;
@@ -158,6 +182,15 @@ export interface OptionQuote {
   vega: number;
   theta: number;
   iv: number;
+}
+
+export interface SwapQuote {
+  code: SwapCode;
+  underlying: FutureCode;
+  tenorMonths: number;
+  referenceMaturity: string; // the listed futures maturity used as the floating reference
+  fixedRate: number; // TND/tonne — current market rate for entering a new swap at this tenor
+  ts: number;
 }
 
 export interface SpanMarginResult {
