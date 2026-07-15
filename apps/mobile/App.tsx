@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { AccountProvider } from "./src/lib/AccountContext";
 import { LangProvider, useLang } from "./src/lib/LangContext";
 import { MarketProvider } from "./src/lib/MarketContext";
 import { ToastProvider } from "./src/lib/ToastContext";
@@ -71,15 +72,17 @@ export default function App() {
     <SafeAreaProvider>
       <LangProvider>
         <MarketProvider>
-          <ToastProvider>
-            <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }} edges={["top"]}>
-              <StatusBar style="light" />
-              <TopBar />
-              <NavigationContainer theme={navTheme}>
-                <Tabs />
-              </NavigationContainer>
-            </SafeAreaView>
-          </ToastProvider>
+          <AccountProvider>
+            <ToastProvider>
+              <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }} edges={["top"]}>
+                <StatusBar style="light" />
+                <TopBar />
+                <NavigationContainer theme={navTheme}>
+                  <Tabs />
+                </NavigationContainer>
+              </SafeAreaView>
+            </ToastProvider>
+          </AccountProvider>
         </MarketProvider>
       </LangProvider>
     </SafeAreaProvider>

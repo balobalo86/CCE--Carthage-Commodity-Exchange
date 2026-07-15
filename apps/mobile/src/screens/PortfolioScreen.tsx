@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { FUTURES, ETFS } from "@cce/shared";
 import { Panel, monoFont } from "../components/Atoms";
 import { T } from "../theme";
-import { useAccount } from "../lib/useAccount";
+import { useAccount } from "../lib/AccountContext";
 import { useLang } from "../lib/LangContext";
 
 export default function PortfolioScreen() {

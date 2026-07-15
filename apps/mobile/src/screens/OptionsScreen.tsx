@@ -4,7 +4,7 @@ import { FUTURES, rejectionMessage, type FutureCode, type OptionType, type Side 
 import { Chip, Panel, monoFont } from "../components/Atoms";
 import { T } from "../theme";
 import { api } from "../lib/api";
-import { useAccount } from "../lib/useAccount";
+import { useAccount } from "../lib/AccountContext";
 import { useLang } from "../lib/LangContext";
 
 export default function OptionsScreen() {

@@ -4,7 +4,7 @@ import { FUTURES, priceBand, rejectionMessage, type FutureCode, type OrderKind, 
 import { Chip, Panel, Row, monoFont } from "../components/Atoms";
 import { T } from "../theme";
 import { api } from "../lib/api";
-import { useAccount } from "../lib/useAccount";
+import { useAccount } from "../lib/AccountContext";
 import { useLang } from "../lib/LangContext";
 import { useMarket } from "../lib/MarketContext";
 import { useToastCtx } from "../lib/ToastContext";

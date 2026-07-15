@@ -4,7 +4,7 @@ import { ETFS, rejectionMessage, type EtfCode } from "@cce/shared";
 import { Chip, Panel, Row, monoFont } from "../components/Atoms";
 import { T } from "../theme";
 import { api } from "../lib/api";
-import { useAccount } from "../lib/useAccount";
+import { useAccount } from "../lib/AccountContext";
 import { useLang } from "../lib/LangContext";
 import { useMarket } from "../lib/MarketContext";
 
