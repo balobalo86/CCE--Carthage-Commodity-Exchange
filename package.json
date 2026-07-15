@@ -1,0 +1,21 @@
+{
+  "name": "cce-carthage-commodity-exchange",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CCE — Carthage Commodity Exchange. Demonstration prototype of a Tunisian-dinar commodity derivatives platform (olive oil & dates futures, ETFs, options).",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev:api": "pnpm --filter @cce/api dev",
+    "dev:web": "pnpm --filter @cce/web dev",
+    "dev": "pnpm --filter @cce/api dev & pnpm --filter @cce/web dev",
+    "build": "pnpm --filter @cce/shared build && pnpm --filter @cce/api build && pnpm --filter @cce/web build",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "lint": "pnpm -r --if-present run lint"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}

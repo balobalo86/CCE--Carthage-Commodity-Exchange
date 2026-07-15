@@ -1,0 +1,69 @@
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100vh;
+}
+body {
+  background: #0d1410;
+  color: #e8ecdd;
+}
+button {
+  cursor: pointer;
+}
+input,
+select {
+  outline: none;
+}
+::selection {
+  background: #aebe4544;
+}
+
+@keyframes tape {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tape {
+    animation: none !important;
+  }
+}
+@media (max-width: 900px) {
+  .g2,
+  .g3 {
+    grid-template-columns: 1fr !important;
+  }
+  .hdr-r {
+    display: none !important;
+  }
+}
+
+table.spec td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #26382c;
+  vertical-align: top;
+  font-size: 12.5px;
+}
+table.spec td:first-child {
+  color: #8ba18c;
+  width: 34%;
+}
+code.k {
+  background: #1a2820;
+  border: 1px solid #26382c;
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11.5px;
+  direction: ltr;
+  unicode-bidi: embed;
+}

@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "CCE — Carthage Commodity Exchange",
+    "slug": "cce-carthage-commodity-exchange",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "scheme": "cce",
+    "backgroundColor": "#0d1410",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "tn.cce.mobile"
+    },
+    "android": {
+      "package": "tn.cce.mobile",
+      "adaptiveIcon": { "backgroundColor": "#0d1410" }
+    },
+    "extra": {
+      "apiUrl": "http://localhost:4000",
+      "wsUrl": "ws://localhost:4000/ws"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+# CCE — Carthage Commodity Exchange
+
+A demonstration prototype of a Tunisian-dinar (TND) commodity derivatives platform: futures on
+**olive oil (HOV)** and **Deglet Nour dates (DGN)**, plus **ETFs** tracking those futures curves
+and **options** on the futures (Black-76 pricing). Built to illustrate what such a platform could
+look like, and how it would map onto Tunisian financial regulation (CMF, Tunisie Clearing, CTAF,
+INPDP) — **not** a licensed exchange. Read [`DISCLAIMER.md`](./DISCLAIMER.md) first.
+
+## Structure
+
+```
+apps/
+  api/      Simulated matching engine + market-data service (Node, TypeScript, Express, ws)
+  web/      Trading terminal web app (Vite, React, TypeScript, Tailwind) — FR/AR/EN
+  mobile/   Mobile app (Expo / React Native, TypeScript) — iOS & Android
+packages/
+  shared/   Contract specs, options/margin math, i18n strings, shared types
+docs/
+  ARCHITECTURE.md   What's simulated, what's real engineering, what a production build needs
+  COMPLIANCE.md     Mapping to Tunisian legislation and the CMF regulatory framework
+```
+
+## Quick start
+
+Requires Node ≥ 20 and pnpm.
+
+```bash
+pnpm install
+
+# Terminal 1 — simulated exchange backend (REST + WebSocket) on :4000
+pnpm dev:api
+
+# Terminal 2 — web terminal on :5173
+pnpm dev:web
+
+# Mobile (Expo) — from apps/mobile
+cd apps/mobile && pnpm start
+```
+
+The web app and mobile app both talk to the same simulated backend
+(`apps/api`), so open two browser tabs / a tab + the Expo app to see the
+order book, prices, and fills update live and stay consistent across
+clients.
+
+## What this is / is not
+
+This repository builds a **realistic simulation** of a commodity derivatives venue: an in-memory
+price-time-priority matching engine, pre-trade risk controls (price bands, position limits,
+margin checks), a Black-76 options pricer, and simulated ETF creation/redemption — all exposed
+over a real REST + WebSocket API and consumed by a real web app and a real mobile app.
+
+It is **not** connected to any real market, clearing house, bank, or regulator. No CMF license
+exists or is implied. See `docs/ARCHITECTURE.md` for the honest list of what a production-grade,
+CMF-authorized venue would additionally require.
