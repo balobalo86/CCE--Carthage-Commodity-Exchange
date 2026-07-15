@@ -45,18 +45,25 @@ clients.
 ### Testing the mobile app in Expo Go
 
 1. Make sure your phone and your computer are on the **same Wi-Fi network**.
-2. Find your computer's LAN IP (e.g. `192.168.1.42`) and set it in
-   `apps/mobile/app.json` under `expo.extra`:
-   ```json
-   "extra": { "apiUrl": "http://192.168.1.42:4000", "wsUrl": "ws://192.168.1.42:4000/ws" }
+2. Find your computer's LAN IP — not this repo's, *yours*, since the phone needs to
+   reach the machine actually running the dev server:
+   - macOS: `ipconfig getifaddr en0` (or `en1` if Wi-Fi isn't `en0`)
+   - Windows: `ipconfig` → "IPv4 Address" under your Wi-Fi adapter
+   - Linux: `hostname -I`
+3. Copy `apps/mobile/.env.example` to `apps/mobile/.env` and put that IP in both
+   URLs (`localhost` won't work here — on the phone, `localhost` means the phone
+   itself):
    ```
-   (`localhost` won't work here — on the phone, `localhost` means the phone itself.)
-3. Run `pnpm dev:api` in one terminal, `cd apps/mobile && pnpm start` in another.
-4. Scan the QR code Expo CLI prints with the Expo Go app (Android: in-app scanner;
+   EXPO_PUBLIC_API_URL=http://192.168.1.42:4000
+   EXPO_PUBLIC_WS_URL=ws://192.168.1.42:4000/ws
+   ```
+   Expo CLI loads `.env` automatically — no need to edit `app.json`.
+4. Run `pnpm dev:api` in one terminal, `cd apps/mobile && pnpm start` in another.
+5. Scan the QR code Expo CLI prints with the Expo Go app (Android: in-app scanner;
    iOS: Camera app). No tunnel/ngrok needed as long as you're on the same network.
-5. Not on the same network? Run `pnpm start -- --tunnel` instead (uses `@expo/ngrok`,
-   already a dev dependency) and point `apiUrl`/`wsUrl` at a similarly tunneled copy of
-   `apps/api` (e.g. via `ngrok http 4000`).
+6. Not on the same network? Run `pnpm start -- --tunnel` instead (uses `@expo/ngrok`,
+   already a dev dependency) and point `.env`'s `EXPO_PUBLIC_API_URL`/`EXPO_PUBLIC_WS_URL`
+   at a similarly tunneled copy of `apps/api` (e.g. via `ngrok http 4000`).
 
 You can also preview the app in a browser without a phone at all via
 `cd apps/mobile && pnpm web`, which runs the same code through `react-native-web`.
