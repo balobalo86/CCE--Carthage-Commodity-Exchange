@@ -42,6 +42,25 @@ The web app and mobile app both talk to the same simulated backend
 order book, prices, and fills update live and stay consistent across
 clients.
 
+### Testing the mobile app in Expo Go
+
+1. Make sure your phone and your computer are on the **same Wi-Fi network**.
+2. Find your computer's LAN IP (e.g. `192.168.1.42`) and set it in
+   `apps/mobile/app.json` under `expo.extra`:
+   ```json
+   "extra": { "apiUrl": "http://192.168.1.42:4000", "wsUrl": "ws://192.168.1.42:4000/ws" }
+   ```
+   (`localhost` won't work here — on the phone, `localhost` means the phone itself.)
+3. Run `pnpm dev:api` in one terminal, `cd apps/mobile && pnpm start` in another.
+4. Scan the QR code Expo CLI prints with the Expo Go app (Android: in-app scanner;
+   iOS: Camera app). No tunnel/ngrok needed as long as you're on the same network.
+5. Not on the same network? Run `pnpm start -- --tunnel` instead (uses `@expo/ngrok`,
+   already a dev dependency) and point `apiUrl`/`wsUrl` at a similarly tunneled copy of
+   `apps/api` (e.g. via `ngrok http 4000`).
+
+You can also preview the app in a browser without a phone at all via
+`cd apps/mobile && pnpm web`, which runs the same code through `react-native-web`.
+
 ## What this is / is not
 
 This repository builds a **realistic simulation** of a commodity derivatives venue: an in-memory
