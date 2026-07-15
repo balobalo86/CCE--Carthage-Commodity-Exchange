@@ -5,7 +5,7 @@ services:
     plan: free
     region: frankfurt
     rootDir: .
-    buildCommand: corepack enable && pnpm install --frozen-lockfile
+    buildCommand: npm install -g pnpm@10 && pnpm install --frozen-lockfile
     startCommand: pnpm --filter @cce/api start
     envVars:
       - key: NODE_VERSION
@@ -15,7 +15,7 @@ services:
     name: cce-web
     runtime: static
     rootDir: .
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @cce/web build
+    buildCommand: npm install -g pnpm@10 && pnpm install --frozen-lockfile && pnpm --filter @cce/web build
     staticPublishPath: apps/web/dist
     envVars:
       - key: NODE_VERSION
