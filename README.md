@@ -18,6 +18,8 @@ packages/
 docs/
   ARCHITECTURE.md   What's simulated, what's real engineering, what a production build needs
   COMPLIANCE.md     Mapping to Tunisian legislation and the CMF regulatory framework
+  DEPLOY.md         Deploying apps/api + apps/web to Render
+render.yaml         Render Blueprint for the above
 ```
 
 ## Quick start
