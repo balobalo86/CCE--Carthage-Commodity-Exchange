@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FUTURES, type FutureCode, type OptionType, type Side } from "@cce/shared";
+import { FUTURES, rejectionMessage, type FutureCode, type OptionType, type Side } from "@cce/shared";
 import { Chip, Panel, Row } from "../components/Atoms";
 import { T } from "../theme";
 import { api } from "../lib/api";
@@ -56,7 +56,7 @@ export default function OptionsPage() {
     setSubmitting(true);
     try {
       const order = await api.submitOption({ code: sel, maturity, strike: picked.strike, optionType: picked.optionType, side, qty });
-      if (order.status === "rejected") showToast({ kind: "warn", msg: order.rejectReason ?? "Order rejected." });
+      if (order.status === "rejected") showToast({ kind: "warn", msg: rejectionMessage(t, order) });
       else showToast({ kind: "ok", msg: `${order.id} — ${side === "buy" ? t.common.buy : t.common.sell} ${qty} × ${sel} ${picked.optionType.toUpperCase()} ${picked.strike} @ ${order.fillPx} TND/t` });
       refresh();
     } catch (e: any) {

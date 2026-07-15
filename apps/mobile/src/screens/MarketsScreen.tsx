@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { FUTURES, priceBand, type FutureCode, type OrderKind, type Side } from "@cce/shared";
+import { FUTURES, priceBand, rejectionMessage, type FutureCode, type OrderKind, type Side } from "@cce/shared";
 import { Chip, Panel, Row, monoFont } from "../components/Atoms";
 import { T } from "../theme";
 import { api } from "../lib/api";
@@ -42,8 +42,8 @@ export default function MarketsScreen() {
     setSubmitting(true);
     try {
       const order = await api.submitFuture({ code: sel, maturity, side, kind: ordType, qty: Math.max(1, +qty || 1), limitPx: ordType === "limit" ? +limitPx || undefined : undefined });
-      if (order.status === "rejected") showToast({ kind: "warn", msg: order.rejectReason ?? "Order rejected." });
-      else showToast({ kind: "ok", msg: `${order.id} — ${side} ${qty} × ${sel} @ ${order.fillPx}` });
+      if (order.status === "rejected") showToast({ kind: "warn", msg: rejectionMessage(t, order, { lo: String(band.lo), hi: String(band.hi) }) });
+      else showToast({ kind: "ok", msg: `${order.id} — ${side === "buy" ? t.common.buy : t.common.sell} ${qty} × ${sel} @ ${order.fillPx}` });
       refresh();
     } catch (e: any) {
       showToast({ kind: "warn", msg: e.message ?? "Order failed." });

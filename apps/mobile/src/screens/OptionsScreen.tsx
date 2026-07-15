@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { FUTURES, type FutureCode, type OptionType, type Side } from "@cce/shared";
+import { FUTURES, rejectionMessage, type FutureCode, type OptionType, type Side } from "@cce/shared";
 import { Chip, Panel, monoFont } from "../components/Atoms";
 import { T } from "../theme";
 import { api } from "../lib/api";
@@ -41,7 +41,7 @@ export default function OptionsScreen() {
     if (!portfolio?.ackOnFile) return setMsg(t.trade.ackWarn);
     try {
       const order = await api.submitOption({ code: sel, maturity, strike: picked.strike, optionType: picked.optionType, side, qty: Math.max(1, +qty || 1) });
-      setMsg(order.status === "rejected" ? order.rejectReason ?? "Rejected" : `${order.id} @ ${order.fillPx} TND/t`);
+      setMsg(order.status === "rejected" ? rejectionMessage(t, order) : `${order.id} @ ${order.fillPx} TND/t`);
       refresh();
     } catch (e: any) {
       setMsg(e.message);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ETFS, FUTURES, type EtfCode } from "@cce/shared";
+import { ETFS, FUTURES, rejectionMessage, type EtfCode } from "@cce/shared";
 import { Chip, Panel, Row } from "../components/Atoms";
 import { T } from "../theme";
 import { api } from "../lib/api";
@@ -29,8 +29,8 @@ export default function EtfPage() {
     setSubmitting(true);
     try {
       const order = await api.submitEtf({ code: sel, side, units });
-      if (order.status === "rejected") showToast({ kind: "warn", msg: order.rejectReason ?? "Order rejected." });
-      else showToast({ kind: "ok", msg: `${order.id} — ${side} ${units} ${t.etf.units} ${sel} @ ${order.fillPx} TND (NAV)` });
+      if (order.status === "rejected") showToast({ kind: "warn", msg: rejectionMessage(t, order) });
+      else showToast({ kind: "ok", msg: `${order.id} — ${side === "subscribe" ? t.etf.subscribe : t.etf.redeem} ${units} ${t.etf.units} ${sel} @ ${order.fillPx} TND (NAV)` });
       refresh();
     } catch (e: any) {
       showToast({ kind: "warn", msg: e.message ?? "Order failed." });

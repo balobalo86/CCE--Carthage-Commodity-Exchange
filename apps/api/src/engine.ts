@@ -16,6 +16,7 @@ import {
   type OptionQuote,
   type OptionType,
   type EtfPosition,
+  type RiskReasonCode,
   type Side,
 } from "@cce/shared";
 import { OrderBook } from "./orderBook.js";
@@ -238,8 +239,8 @@ class Engine {
     const account = this.getOrCreateAccount(accountId);
     const future = FUTURES[code];
     const quote = this.getQuote(code, maturity);
-    const reject = (message: string, reasonCode: string) => {
-      const order: Order = { id: nextOrderId(), accountId, assetClass: "future", code, maturity, side, kind, qty, limitPx, status: "rejected", rejectReason: `${reasonCode}: ${message}`, ts: Date.now() };
+    const reject = (message: string, reasonCode: RiskReasonCode) => {
+      const order: Order = { id: nextOrderId(), accountId, assetClass: "future", code, maturity, side, kind, qty, limitPx, status: "rejected", rejectReason: `${reasonCode}: ${message}`, reasonCode, ts: Date.now() };
       account.orders.unshift(order);
       return order;
     };
@@ -283,8 +284,8 @@ class Engine {
     const account = this.getOrCreateAccount(accountId);
     const future = FUTURES[code];
     const oq = this.getOptionQuote(code, maturity, strike, optionType);
-    const reject = (message: string, reasonCode: string) => {
-      const order: Order = { id: nextOrderId(), accountId, assetClass: "option", code, maturity, strike, optionType, side, kind: "market", qty, status: "rejected", rejectReason: `${reasonCode}: ${message}`, ts: Date.now() };
+    const reject = (message: string, reasonCode: RiskReasonCode) => {
+      const order: Order = { id: nextOrderId(), accountId, assetClass: "option", code, maturity, strike, optionType, side, kind: "market", qty, status: "rejected", rejectReason: `${reasonCode}: ${message}`, reasonCode, ts: Date.now() };
       account.orders.unshift(order);
       return order;
     };
@@ -323,8 +324,8 @@ class Engine {
     const account = this.getOrCreateAccount(accountId);
     const etf = ETFS[etfCode];
     const eq = this.getEtfQuote(etfCode);
-    const reject = (message: string, reasonCode: string) => {
-      const order: Order = { id: nextOrderId(), accountId, assetClass: "etf", code: etfCode, side: side === "subscribe" ? "buy" : "sell", kind: "market", qty: units, status: "rejected", rejectReason: `${reasonCode}: ${message}`, ts: Date.now() };
+    const reject = (message: string, reasonCode: RiskReasonCode) => {
+      const order: Order = { id: nextOrderId(), accountId, assetClass: "etf", code: etfCode, side: side === "subscribe" ? "buy" : "sell", kind: "market", qty: units, status: "rejected", rejectReason: `${reasonCode}: ${message}`, reasonCode, ts: Date.now() };
       account.orders.unshift(order);
       return order;
     };

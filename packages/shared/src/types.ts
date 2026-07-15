@@ -77,14 +77,17 @@ export interface OrderBookSnapshot {
   asks: BookLevel[];
 }
 
+export type RiskReasonCode =
+  | "NO_ACK"
+  | "OUT_OF_BAND"
+  | "POSITION_LIMIT"
+  | "INSUFFICIENT_MARGIN"
+  | "FAT_FINGER"
+  | "UNKNOWN";
+
 export interface RiskCheckResult {
   ok: boolean;
-  reasonCode?:
-    | "NO_ACK"
-    | "OUT_OF_BAND"
-    | "POSITION_LIMIT"
-    | "INSUFFICIENT_MARGIN"
-    | "FAT_FINGER";
+  reasonCode?: RiskReasonCode;
   message?: string;
 }
 
@@ -103,6 +106,7 @@ export interface Order {
   status: "filled" | "rejected";
   fillPx?: number;
   rejectReason?: string;
+  reasonCode?: RiskReasonCode;
   ts: number;
 }
 

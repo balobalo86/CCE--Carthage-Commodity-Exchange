@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { ETFS, type EtfCode } from "@cce/shared";
+import { ETFS, rejectionMessage, type EtfCode } from "@cce/shared";
 import { Chip, Panel, Row, monoFont } from "../components/Atoms";
 import { T } from "../theme";
 import { api } from "../lib/api";
@@ -25,7 +25,7 @@ export default function EtfScreen() {
     if (!portfolio?.ackOnFile) return setMsg(t.trade.ackWarn);
     try {
       const order = await api.submitEtf({ code: sel, side, units: Math.max(1, +units || 1) });
-      setMsg(order.status === "rejected" ? order.rejectReason ?? "Rejected" : `${order.id} @ NAV ${order.fillPx}`);
+      setMsg(order.status === "rejected" ? rejectionMessage(t, order) : `${order.id} @ NAV ${order.fillPx}`);
       refresh();
     } catch (e: any) {
       setMsg(e.message);

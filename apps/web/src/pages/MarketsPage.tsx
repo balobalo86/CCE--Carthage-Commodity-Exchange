@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Bar, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { FUTURES, priceBand, type FutureCode, type OrderBookSnapshot, type OrderKind, type Side } from "@cce/shared";
+import { FUTURES, priceBand, rejectionMessage, type FutureCode, type OrderBookSnapshot, type OrderKind, type Side } from "@cce/shared";
 import { Chip, Panel, Row } from "../components/Atoms";
 import PriceChart from "../components/PriceChart";
 import { T } from "../theme";
@@ -73,7 +73,7 @@ export default function MarketsPage() {
     try {
       const order = await api.submitFuture({ code: sel, maturity, side, kind: ordType, qty, limitPx: ordType === "limit" ? +limitPx || undefined : undefined });
       if (order.status === "rejected") {
-        showToast({ kind: "warn", msg: order.rejectReason ?? "Order rejected." });
+        showToast({ kind: "warn", msg: rejectionMessage(t, order, { lo: String(band.lo), hi: String(band.hi) }) });
       } else {
         showToast({
           kind: "ok",

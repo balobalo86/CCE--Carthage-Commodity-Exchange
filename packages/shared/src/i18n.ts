@@ -79,6 +79,9 @@ export interface Dict {
     ackWarn: string;
     bandWarn: (lo: string, hi: string) => string;
     positionLimitWarn: string;
+    insufficientMarginWarn: string;
+    fatFingerWarn: string;
+    genericRejectWarn: string;
     execOk: (id: string, s: string, q: string, c: string, m: string, p: string) => string;
     orders: string;
     noOrders: string;
@@ -165,6 +168,9 @@ export const I18N: Record<Lang, Dict> = {
       ackWarn: "Cochez la reconnaissance des risques avant de transmettre l'ordre.",
       bandWarn: (lo, hi) => `Prix hors seuils de réservation (${lo} – ${hi} TND/t). Ordre rejeté par le contrôle pré-négociation.`,
       positionLimitWarn: "Cet ordre dépasserait la limite de position autorisée. Ordre rejeté par le contrôle pré-négociation.",
+      insufficientMarginWarn: "Dépôt de garantie disponible insuffisant pour couvrir cet ordre.",
+      fatFingerWarn: "Quantité invalide (contrôle anti-erreur de saisie). Ordre rejeté par le contrôle pré-négociation.",
+      genericRejectWarn: "Ordre rejeté par le contrôle pré-négociation.",
       execOk: (id, s, q, c, m, p) => `Ordre ${id} exécuté — ${s} ${q} ${c} ${m} à ${p} TND/t. Compensation CCE Clearing (J+1, simulée).`,
       orders: "Ordres du jour", noOrders: "Aucun ordre transmis pendant cette séance.",
       auditTrail: "Ordre horodaté et journalisé (piste d'audit) — intermédiaire en bourse agréé requis en environnement réel.",
@@ -222,6 +228,9 @@ export const I18N: Record<Lang, Dict> = {
       ackWarn: "Tick the risk acknowledgement before submitting the order.",
       bandWarn: (lo, hi) => `Price outside daily bands (${lo} – ${hi} TND/t). Order rejected by pre-trade controls.`,
       positionLimitWarn: "This order would exceed the allowed position limit. Order rejected by pre-trade controls.",
+      insufficientMarginWarn: "Insufficient available margin to cover this order.",
+      fatFingerWarn: "Invalid quantity (fat-finger control). Order rejected by pre-trade controls.",
+      genericRejectWarn: "Order rejected by pre-trade controls.",
       execOk: (id, s, q, c, m, p) => `Order ${id} filled — ${s} ${q} ${c} ${m} at ${p} TND/t. Cleared by CCE Clearing (T+1, simulated).`,
       orders: "Today's orders", noOrders: "No orders submitted this session.",
       auditTrail: "Order time-stamped and journaled (audit trail) — a licensed broker would be required in a real environment.",
@@ -279,6 +288,9 @@ export const I18N: Record<Lang, Dict> = {
       ackWarn: "يرجى تأكيد الإقرار بالمخاطر قبل إرسال الأمر.",
       bandWarn: (lo, hi) => `السعر خارج حدود التذبذب (${lo} – ${hi} دينار/طن). رُفض الأمر من الرقابة القبلية.`,
       positionLimitWarn: "سيتجاوز هذا الأمر حد المراكز المسموح به. رُفض الأمر من الرقابة القبلية.",
+      insufficientMarginWarn: "هامش الضمان المتاح غير كافٍ لتغطية هذا الأمر.",
+      fatFingerWarn: "كمية غير صالحة (رقابة الأخطاء الجسيمة). رُفض الأمر من الرقابة القبلية.",
+      genericRejectWarn: "رُفض الأمر من الرقابة القبلية.",
       execOk: (id, s, q, c, m, p) => `نُفّذ الأمر ${id} — ${s} ${q} ${c} ${m} بسعر ${p} دينار/طن. مقاصة عبر CCE Clearing (محاكاة).`,
       orders: "أوامر اليوم", noOrders: "لم تُرسل أي أوامر خلال هذه الحصّة.",
       auditTrail: "أمر مختوم زمنيًا ومسجّل — يشترط وسيط بورصة مرخّص في بيئة حقيقية.",
@@ -314,3 +326,30 @@ export const I18N: Record<Lang, Dict> = {
     footer: "CCE — نموذج تجريبي أُنجز لأغراض الدراسة. لا يشكّل عرض خدمات استثمارية ولا منصة مرخّصة من هيئة السوق المالية ولا نصيحة استثمارية. أسعار محاكاة.",
   },
 };
+
+/**
+ * Maps a rejected order's structured reasonCode to the localized message,
+ * instead of surfacing the server's raw technical rejectReason string to
+ * end users. `band` is only used for OUT_OF_BAND on futures orders, where
+ * the caller knows the current session's price band.
+ */
+export function rejectionMessage(
+  t: Dict,
+  order: { reasonCode?: string; rejectReason?: string },
+  band?: { lo: string; hi: string }
+): string {
+  switch (order.reasonCode) {
+    case "NO_ACK":
+      return t.trade.ackWarn;
+    case "OUT_OF_BAND":
+      return band ? t.trade.bandWarn(band.lo, band.hi) : t.trade.genericRejectWarn;
+    case "POSITION_LIMIT":
+      return t.trade.positionLimitWarn;
+    case "INSUFFICIENT_MARGIN":
+      return t.trade.insufficientMarginWarn;
+    case "FAT_FINGER":
+      return t.trade.fatFingerWarn;
+    default:
+      return t.trade.genericRejectWarn;
+  }
+}
