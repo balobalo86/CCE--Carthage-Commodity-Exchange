@@ -13,6 +13,8 @@ import OptionsScreen from "./src/screens/OptionsScreen";
 import SwapsScreen from "./src/screens/SwapsScreen";
 import EtfScreen from "./src/screens/EtfScreen";
 import PortfolioScreen from "./src/screens/PortfolioScreen";
+import SpecsScreen from "./src/screens/SpecsScreen";
+import HelpScreen from "./src/screens/HelpScreen";
 import AccountScreen from "./src/screens/AccountScreen";
 import { T } from "./src/theme";
 
@@ -68,6 +70,8 @@ function Tabs() {
       <Tab.Screen name="swaps" component={SwapsScreen} options={{ title: t.tabs.swaps }} />
       <Tab.Screen name="etf" component={EtfScreen} options={{ title: t.tabs.etf }} />
       <Tab.Screen name="portfolio" component={PortfolioScreen} options={{ title: t.tabs.portfolio }} />
+      <Tab.Screen name="specs" component={SpecsScreen} options={{ title: t.tabs.specs }} />
+      <Tab.Screen name="help" component={HelpScreen} options={{ title: t.tabs.help }} />
       <Tab.Screen name="account" component={AccountScreen} options={{ title: user ? user.fullName : t.auth.signIn }} />
     </Tab.Navigator>
   );
