@@ -4,6 +4,7 @@ import { createServer } from "node:http";
 import { WebSocketServer } from "ws";
 import { ETFS, FUTURES, SWAPS } from "@cce/shared";
 import { engine } from "./engine.js";
+import { authStore } from "./auth.js";
 
 const PORT = Number(process.env.PORT ?? 4000);
 
@@ -72,6 +73,38 @@ app.get("/api/swaps/:code/:tenor", (req, res) => {
   const quote = engine.getSwapQuote(req.params.code, Number(req.params.tenor));
   if (!quote) return res.status(404).json({ error: "Unknown swap or tenor." });
   res.json(quote);
+});
+
+app.post("/api/auth/register", (req, res) => {
+  const { email, password, fullName } = req.body ?? {};
+  if (!email || !password || !fullName) return res.status(400).json({ error: "Missing required fields." });
+  const result = authStore.register(String(email), String(password), String(fullName));
+  if ("error" in result) return res.status(409).json({ error: result.error });
+  engine.getOrCreateAccount(result.user.accountId);
+  res.json(result);
+});
+
+app.post("/api/auth/login", (req, res) => {
+  const { email, password } = req.body ?? {};
+  if (!email || !password) return res.status(400).json({ error: "Missing required fields." });
+  const result = authStore.login(String(email), String(password));
+  if ("error" in result) return res.status(401).json({ error: result.error });
+  res.json(result);
+});
+
+app.get("/api/auth/me", (req, res) => {
+  const authz = req.headers.authorization ?? "";
+  const token = authz.startsWith("Bearer ") ? authz.slice(7) : "";
+  const user = token ? authStore.me(token) : null;
+  if (!user) return res.status(401).json({ error: "Not authenticated." });
+  res.json({ user });
+});
+
+app.post("/api/auth/logout", (req, res) => {
+  const authz = req.headers.authorization ?? "";
+  const token = authz.startsWith("Bearer ") ? authz.slice(7) : "";
+  if (token) authStore.logout(token);
+  res.json({ ok: true });
 });
 
 app.post("/api/accounts/:id/ack", (req, res) => {

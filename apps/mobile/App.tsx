@@ -4,6 +4,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AccountProvider } from "./src/lib/AccountContext";
+import { AuthProvider, useAuth } from "./src/lib/AuthContext";
 import { LangProvider, useLang } from "./src/lib/LangContext";
 import { MarketProvider } from "./src/lib/MarketContext";
 import { ToastProvider } from "./src/lib/ToastContext";
@@ -12,6 +13,7 @@ import OptionsScreen from "./src/screens/OptionsScreen";
 import SwapsScreen from "./src/screens/SwapsScreen";
 import EtfScreen from "./src/screens/EtfScreen";
 import PortfolioScreen from "./src/screens/PortfolioScreen";
+import AccountScreen from "./src/screens/AccountScreen";
 import { T } from "./src/theme";
 
 const Tab = createBottomTabNavigator();
@@ -51,6 +53,7 @@ function TopBar() {
 
 function Tabs() {
   const { t } = useLang();
+  const { user } = useAuth();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -65,6 +68,7 @@ function Tabs() {
       <Tab.Screen name="swaps" component={SwapsScreen} options={{ title: t.tabs.swaps }} />
       <Tab.Screen name="etf" component={EtfScreen} options={{ title: t.tabs.etf }} />
       <Tab.Screen name="portfolio" component={PortfolioScreen} options={{ title: t.tabs.portfolio }} />
+      <Tab.Screen name="account" component={AccountScreen} options={{ title: user ? user.fullName : t.auth.signIn }} />
     </Tab.Navigator>
   );
 }
@@ -73,19 +77,21 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <LangProvider>
-        <MarketProvider>
-          <AccountProvider>
-            <ToastProvider>
-              <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }} edges={["top"]}>
-                <StatusBar style="light" />
-                <TopBar />
-                <NavigationContainer theme={navTheme}>
-                  <Tabs />
-                </NavigationContainer>
-              </SafeAreaView>
-            </ToastProvider>
-          </AccountProvider>
-        </MarketProvider>
+        <AuthProvider>
+          <MarketProvider>
+            <AccountProvider>
+              <ToastProvider>
+                <SafeAreaView style={{ flex: 1, backgroundColor: T.bg }} edges={["top"]}>
+                  <StatusBar style="light" />
+                  <TopBar />
+                  <NavigationContainer theme={navTheme}>
+                    <Tabs />
+                  </NavigationContainer>
+                </SafeAreaView>
+              </ToastProvider>
+            </AccountProvider>
+          </MarketProvider>
+        </AuthProvider>
       </LangProvider>
     </SafeAreaProvider>
   );

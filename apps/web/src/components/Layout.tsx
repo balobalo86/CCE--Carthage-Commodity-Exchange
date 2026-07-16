@@ -1,6 +1,8 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { FUTURES } from "@cce/shared";
 import { T } from "../theme";
+import { useAuth } from "../lib/AuthContext";
 import { useLang } from "../lib/LangContext";
 import { useMarket } from "../lib/MarketContext";
 import { useToastCtx } from "../lib/ToastContext";
@@ -8,6 +10,7 @@ import { Chip } from "./Atoms";
 
 const NAV_ITEMS: { key: keyof ReturnType<typeof useLang>["t"]["tabs"]; to: string }[] = [
   { key: "markets", to: "/" },
+  { key: "futures", to: "/futures" },
   { key: "options", to: "/options" },
   { key: "swaps", to: "/swaps" },
   { key: "etf", to: "/etf" },
@@ -18,6 +21,60 @@ const NAV_ITEMS: { key: keyof ReturnType<typeof useLang>["t"]["tabs"]; to: strin
   { key: "compliance", to: "/compliance" },
   { key: "help", to: "/help" },
 ];
+
+function AccountMenu() {
+  const { t } = useLang();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+
+  if (!user) {
+    return (
+      <span style={{ display: "inline-flex", gap: 6 }}>
+        <NavLink
+          to="/sign-in"
+          style={{ background: "transparent", border: `1px solid ${T.line}`, borderRadius: 4, padding: "6px 12px", fontSize: 12, color: T.text, textDecoration: "none", fontFamily: "inherit" }}
+        >
+          {t.auth.signIn}
+        </NavLink>
+        <NavLink
+          to="/sign-up"
+          style={{ background: T.olive, border: "1px solid transparent", borderRadius: 4, padding: "6px 12px", fontSize: 12, color: "#121608", fontWeight: 600, textDecoration: "none", fontFamily: "inherit" }}
+        >
+          {t.auth.signUp}
+        </NavLink>
+      </span>
+    );
+  }
+
+  return (
+    <span style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        style={{ background: "transparent", border: `1px solid ${T.line}`, borderRadius: 4, padding: "6px 12px", fontSize: 12, color: T.text, fontFamily: "inherit", cursor: "pointer" }}
+      >
+        {user.fullName} ▾
+      </button>
+      {open && (
+        <div style={{ position: "absolute", insetInlineEnd: 0, top: "calc(100% + 6px)", background: T.panel, border: `1px solid ${T.line}`, borderRadius: 6, padding: 8, minWidth: 200, zIndex: 40, boxShadow: "0 8px 30px rgba(0,0,0,.45)" }}>
+          <div style={{ fontSize: 11, color: T.faint, padding: "4px 8px 8px", borderBottom: `1px solid ${T.line}`, marginBottom: 6 }}>
+            {t.auth.loggedInAs} <span style={{ color: T.text, direction: "ltr", display: "inline-block" }}>{user.email}</span>
+          </div>
+          <button
+            onClick={() => {
+              setOpen(false);
+              logout();
+              navigate("/");
+            }}
+            style={{ width: "100%", textAlign: "start", background: "transparent", border: "none", color: T.warn, fontSize: 12.5, padding: "6px 8px", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            {t.auth.logOutBtn}
+          </button>
+        </div>
+      )}
+    </span>
+  );
+}
 
 export default function Layout() {
   const { lang, setLang, t } = useLang();
@@ -64,6 +121,7 @@ export default function Layout() {
               </button>
             ))}
           </span>
+          <AccountMenu />
         </div>
       </header>
 

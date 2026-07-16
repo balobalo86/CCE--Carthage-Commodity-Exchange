@@ -1,7 +1,7 @@
 import { Panel, Row } from "../components/Atoms";
 import { T } from "../theme";
 import { useLang } from "../lib/LangContext";
-import { useAccount } from "../lib/useAccount";
+import { useAccount } from "../lib/AccountContext";
 
 export default function CompliancePage() {
   const { lang, t } = useLang();

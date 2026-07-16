@@ -25,6 +25,7 @@ export interface Dict {
   ccy: string;
   tabs: {
     markets: string;
+    futures: string;
     options: string;
     swaps: string;
     etf: string;
@@ -174,15 +175,51 @@ export interface Dict {
     providersTitle: string;
     providersTxt: string;
     providers: string[];
+    chartTitle: string;
+    downloadCsv: string;
+    apiKeyTitle: string;
+    apiKeyTxt: string;
+    apiKeyBtn: string;
+    apiKeyLoginPrompt: string;
   };
   participants: {
     title: string;
     usersTitle: string;
     usersTxt: string;
     usersSteps: string[];
+    membershipTitle: string;
+    membershipIntro: string;
+    membershipTypes: { name: string; requirements: string; privileges: string }[];
+    becomeMemberTxt: string;
+    becomeMemberBtn: string;
     regulatorsTitle: string;
     regulatorsTxt: string;
     regulatorsPoints: string[];
+    regulatorsListTitle: string;
+    regulators: { name: string; role: string }[];
+  };
+  home: {
+    productsTitle: string;
+    resourcesTitle: string;
+    explore: string;
+    optionsTeaser: string;
+  };
+  auth: {
+    signIn: string;
+    signUp: string;
+    email: string;
+    password: string;
+    fullName: string;
+    signInBtn: string;
+    signUpBtn: string;
+    logOutBtn: string;
+    noAccount: string;
+    haveAccount: string;
+    guestNote: string;
+    welcomeBack: string;
+    signUpSubtitle: string;
+    passwordHint: string;
+    loggedInAs: string;
   };
   footer: string;
 }
@@ -196,7 +233,7 @@ export const I18N: Record<Lang, Dict> = {
     session: "Séance ouverte — 09:00–14:30 (Tunis)",
     clearing: "Compensation (simulée) : CCE Clearing",
     ccy: "Cotation : TND — dinar tunisien",
-    tabs: { markets: "Marchés", options: "Options", swaps: "Swaps", etf: "ETF", trade: "Négociation", portfolio: "Portefeuille", specs: "Spécifications", marketData: "Données & API", participants: "Participants", compliance: "Conformité & CMF", help: "Assistance" },
+    tabs: { markets: "Marchés", futures: "Contrats à terme", options: "Options", swaps: "Swaps", etf: "ETF", trade: "Négociation", portfolio: "Portefeuille", specs: "Spécifications", marketData: "Données & API", participants: "Participants", compliance: "Conformité & CMF", help: "Assistance" },
     common: {
       last: "Dernier", chg: "Var.", settle: "Liquidation", vol: "Volume (lots)", oi: "Positions ouvertes", high: "Plus haut", low: "Plus bas",
       buy: "Achat", sell: "Vente", qty: "Quantité", price: "Prix", time: "Heure", status: "Statut", book: "Carnet d'ordres", side: "Sens", submit: "Transmettre", cancel: "Annuler",
@@ -292,6 +329,12 @@ export const I18N: Record<Lang, Dict> = {
         "Médias économiques locaux (rediffusion des prix de clôture)",
         "Fournisseur de données historiques / recherche académique",
       ],
+      chartTitle: "Série de règlement quotidien",
+      downloadCsv: "Télécharger en CSV",
+      apiKeyTitle: "Clé API (démonstration)",
+      apiKeyTxt: "Une fois connecté, générez une clé API de démonstration pour simuler l'authentification Bearer décrite ci-dessus. Aucune clé n'ouvre un accès réel à des données financières.",
+      apiKeyBtn: "Générer une clé de démonstration",
+      apiKeyLoginPrompt: "Connectez-vous pour générer une clé API de démonstration.",
     },
     participants: {
       title: "Participants au marché",
@@ -304,6 +347,16 @@ export const I18N: Record<Lang, Dict> = {
         "Remise et accusé de réception de la note d'information visée par le CMF",
         "Dépôt initial de garantie avant toute négociation",
       ],
+      membershipTitle: "Catégories d'adhésion (inspirées de CME/ICE)",
+      membershipIntro: "Une bourse de dérivés réelle distingue plusieurs catégories de participants selon le niveau d'accès et de responsabilité financière. Aperçu illustratif :",
+      membershipTypes: [
+        { name: "Client individuel / Trader particulier", requirements: "KYC, questionnaire d'adéquation, dépôt de garantie initial", privileges: "Négociation via un intermédiaire agréé, accès temps réel différé" },
+        { name: "Client institutionnel / Corporate", requirements: "KYC renforcé, RNE, bénéficiaires effectifs, convention-cadre ISDA-like", privileges: "Lignes de crédit négociées, accès API abonné, rapports dédiés" },
+        { name: "Adhérent compensateur (Clearing Member)", requirements: "Agrément CMF, fonds propres minimaux, contribution au fonds de garantie", privileges: "Compensation pour compte propre et clients, accès direct à Tunisie Clearing" },
+        { name: "Teneur de marché (Market Maker)", requirements: "Convention de tenue de marché, obligations de cotation continue", privileges: "Remises sur frais de transaction, accès prioritaire au carnet d'ordres" },
+      ],
+      becomeMemberTxt: "Dans ce prototype, la création d'un compte de démonstration simule la première étape du parcours d'adhésion — aucune vérification réelle n'est effectuée.",
+      becomeMemberBtn: "Créer un compte de démonstration",
       regulatorsTitle: "Pour les régulateurs",
       regulatorsTxt: "Le Conseil du Marché Financier (CMF) exercerait la surveillance prudentielle et comportementale d'une bourse de matières premières réelle, avec accès direct aux données de marché et à la piste d'audit.",
       regulatorsPoints: [
@@ -313,6 +366,37 @@ export const I18N: Record<Lang, Dict> = {
         "Pouvoir de suspension et d'enquête en cas de manipulation de cours ou d'opération d'initié",
         "Coordination avec la Banque Centrale de Tunisie (régime des changes) et la CTAF (LBC-FT)",
       ],
+      regulatorsListTitle: "Autorités et organismes concernés",
+      regulators: [
+        { name: "Conseil du Marché Financier (CMF)", role: "Régulateur du marché financier — agrément, surveillance, sanctions" },
+        { name: "Tunisie Clearing", role: "Dépositaire central et organe de compensation-règlement" },
+        { name: "Banque Centrale de Tunisie (BCT)", role: "Régime des changes, stabilité monétaire et financière" },
+        { name: "CTAF", role: "Commission tunisienne des analyses financières — lutte anti-blanchiment (LBC/FT)" },
+        { name: "INPDP", role: "Instance nationale de protection des données personnelles" },
+      ],
+    },
+    home: {
+      productsTitle: "Produits cotés",
+      resourcesTitle: "Ressources",
+      explore: "Explorer",
+      optionsTeaser: "Options européennes sur contrats à terme HOV et DGN, valorisées par le modèle Black-76, sur les 12 échéances cotées.",
+    },
+    auth: {
+      signIn: "Connexion",
+      signUp: "Créer un compte",
+      email: "Adresse e-mail",
+      password: "Mot de passe",
+      fullName: "Nom complet",
+      signInBtn: "Se connecter",
+      signUpBtn: "Créer mon compte",
+      logOutBtn: "Déconnexion",
+      noAccount: "Pas encore de compte ?",
+      haveAccount: "Déjà un compte ?",
+      guestNote: "Vous naviguez en tant qu'invité sur le compte de démonstration partagé. Connectez-vous pour disposer de votre propre compte simulé.",
+      welcomeBack: "Heureux de vous revoir",
+      signUpSubtitle: "Créez un compte de démonstration — aucune donnée réelle, aucun agrément CMF.",
+      passwordHint: "8 caractères minimum.",
+      loggedInAs: "Connecté en tant que",
     },
     footer: "CCE — prototype de démonstration réalisé à des fins d'étude. Ne constitue ni une offre de services d'investissement, ni une plateforme agréée par le CMF, ni un conseil en investissement. Cotations simulées.",
   },
@@ -324,7 +408,7 @@ export const I18N: Record<Lang, Dict> = {
     session: "Session open — 09:00–14:30 (Tunis)",
     clearing: "Clearing (simulated): CCE Clearing",
     ccy: "Quotation: TND — Tunisian dinar",
-    tabs: { markets: "Markets", options: "Options", swaps: "Swaps", etf: "ETFs", trade: "Trading", portfolio: "Portfolio", specs: "Contract Specs", marketData: "Data & API", participants: "Participants", compliance: "Compliance", help: "Support" },
+    tabs: { markets: "Markets", futures: "Futures", options: "Options", swaps: "Swaps", etf: "ETFs", trade: "Trading", portfolio: "Portfolio", specs: "Contract Specs", marketData: "Data & API", participants: "Participants", compliance: "Compliance", help: "Support" },
     common: {
       last: "Last", chg: "Chg", settle: "Settlement", vol: "Volume (lots)", oi: "Open interest", high: "High", low: "Low",
       buy: "Buy", sell: "Sell", qty: "Quantity", price: "Price", time: "Time", status: "Status", book: "Order book", side: "Side", submit: "Submit", cancel: "Cancel",
@@ -420,6 +504,12 @@ export const I18N: Record<Lang, Dict> = {
         "Local financial media (closing-price rebroadcast)",
         "Historical data / academic research provider",
       ],
+      chartTitle: "Daily settlement series",
+      downloadCsv: "Download CSV",
+      apiKeyTitle: "API key (demonstration)",
+      apiKeyTxt: "Once signed in, generate a demo API key to simulate the Bearer authentication described above. No key grants real access to financial data.",
+      apiKeyBtn: "Generate demo key",
+      apiKeyLoginPrompt: "Sign in to generate a demo API key.",
     },
     participants: {
       title: "Market participants",
@@ -432,6 +522,16 @@ export const I18N: Record<Lang, Dict> = {
         "Receipt and acknowledgement of the CMF-approved information notice",
         "Initial margin deposit before any trading",
       ],
+      membershipTitle: "Membership categories (CME/ICE-inspired)",
+      membershipIntro: "A real derivatives exchange distinguishes several participant categories by access level and financial responsibility. Illustrative overview:",
+      membershipTypes: [
+        { name: "Individual client / Retail trader", requirements: "KYC, suitability questionnaire, initial margin deposit", privileges: "Trading via a licensed broker, delayed real-time access" },
+        { name: "Institutional / Corporate client", requirements: "Enhanced KYC, corporate registry, beneficial owners, ISDA-like master agreement", privileges: "Negotiated credit lines, subscriber API access, dedicated reporting" },
+        { name: "Clearing member", requirements: "CMF license, minimum capital, guarantee-fund contribution", privileges: "Clears for own account and clients, direct access to Tunisie Clearing" },
+        { name: "Market maker", requirements: "Market-making agreement, continuous quoting obligations", privileges: "Transaction-fee rebates, priority order-book access" },
+      ],
+      becomeMemberTxt: "In this prototype, creating a demo account simulates the first step of the membership journey — no real verification is performed.",
+      becomeMemberBtn: "Create a demo account",
       regulatorsTitle: "For regulators",
       regulatorsTxt: "The Conseil du Marché Financier (CMF) would exercise prudential and conduct supervision of a real commodity exchange, with direct access to market data and the audit trail.",
       regulatorsPoints: [
@@ -441,6 +541,37 @@ export const I18N: Record<Lang, Dict> = {
         "Power to suspend trading and investigate price manipulation or insider dealing",
         "Coordination with the Central Bank of Tunisia (exchange control) and CTAF (AML/CFT)",
       ],
+      regulatorsListTitle: "Relevant authorities & bodies",
+      regulators: [
+        { name: "Conseil du Marché Financier (CMF)", role: "Financial market regulator — licensing, supervision, sanctions" },
+        { name: "Tunisie Clearing", role: "Central depository and clearing & settlement body" },
+        { name: "Central Bank of Tunisia (BCT)", role: "Exchange control, monetary and financial stability" },
+        { name: "CTAF", role: "Tunisian Financial Analysis Commission — AML/CFT" },
+        { name: "INPDP", role: "National Authority for the Protection of Personal Data" },
+      ],
+    },
+    home: {
+      productsTitle: "Listed products",
+      resourcesTitle: "Resources",
+      explore: "Explore",
+      optionsTeaser: "European options on HOV and DGN futures, priced with the Black-76 model, across all 12 listed maturities.",
+    },
+    auth: {
+      signIn: "Sign In",
+      signUp: "Create Account",
+      email: "Email address",
+      password: "Password",
+      fullName: "Full name",
+      signInBtn: "Sign in",
+      signUpBtn: "Create my account",
+      logOutBtn: "Log out",
+      noAccount: "Don't have an account?",
+      haveAccount: "Already have an account?",
+      guestNote: "You are browsing as a guest on the shared demo account. Sign in to get your own simulated account.",
+      welcomeBack: "Welcome back",
+      signUpSubtitle: "Create a demo account — no real data, no CMF authorization.",
+      passwordHint: "8 characters minimum.",
+      loggedInAs: "Signed in as",
     },
     footer: "CCE — demonstration prototype built for study purposes. Not an offer of investment services, not a CMF-licensed venue, not investment advice. Simulated quotes.",
   },
@@ -452,7 +583,7 @@ export const I18N: Record<Lang, Dict> = {
     session: "الحصّة مفتوحة — 09:00–14:30 (تونس)",
     clearing: "المقاصة (محاكاة): CCE Clearing",
     ccy: "التسعير: دينار تونسي (TND)",
-    tabs: { markets: "الأسواق", options: "الخيارات", swaps: "المبادلات", etf: "صناديق المؤشرات", trade: "التداول", portfolio: "المحفظة", specs: "مواصفات العقود", marketData: "البيانات وواجهة API", participants: "المتعاملون", compliance: "الامتثال وهيئة السوق المالية", help: "المساعدة" },
+    tabs: { markets: "الأسواق", futures: "العقود الآجلة", options: "الخيارات", swaps: "المبادلات", etf: "صناديق المؤشرات", trade: "التداول", portfolio: "المحفظة", specs: "مواصفات العقود", marketData: "البيانات وواجهة API", participants: "المتعاملون", compliance: "الامتثال وهيئة السوق المالية", help: "المساعدة" },
     common: {
       last: "آخر سعر", chg: "التغيّر", settle: "سعر التسوية", vol: "الحجم (عقود)", oi: "المراكز المفتوحة", high: "الأعلى", low: "الأدنى",
       buy: "شراء", sell: "بيع", qty: "الكمية", price: "السعر", time: "الوقت", status: "الحالة", book: "دفتر الأوامر", side: "الاتجاه", submit: "إرسال", cancel: "إلغاء",
@@ -548,6 +679,12 @@ export const I18N: Record<Lang, Dict> = {
         "وسائل إعلام اقتصادية محلية (إعادة بث أسعار الإغلاق)",
         "مزود بيانات تاريخية / بحث أكاديمي",
       ],
+      chartTitle: "سلسلة أسعار التسوية اليومية",
+      downloadCsv: "تنزيل بصيغة CSV",
+      apiKeyTitle: "مفتاح API (تجريبي)",
+      apiKeyTxt: "بعد تسجيل الدخول، أنشئ مفتاح API تجريبيًا لمحاكاة مصادقة Bearer الموصوفة أعلاه. لا يمنح أي مفتاح نفاذًا حقيقيًا إلى بيانات مالية.",
+      apiKeyBtn: "إنشاء مفتاح تجريبي",
+      apiKeyLoginPrompt: "سجّل الدخول لإنشاء مفتاح API تجريبي.",
     },
     participants: {
       title: "المتعاملون في السوق",
@@ -560,6 +697,16 @@ export const I18N: Record<Lang, Dict> = {
         "استلام والإقرار بنشرة المعلومات المؤشرة من هيئة السوق المالية",
         "إيداع هامش ضمان أولي قبل أي تداول",
       ],
+      membershipTitle: "فئات العضوية (على غرار CME/ICE)",
+      membershipIntro: "تميّز بورصة مشتقات حقيقية بين عدة فئات من المتعاملين حسب مستوى النفاذ والمسؤولية المالية. لمحة توضيحية:",
+      membershipTypes: [
+        { name: "عميل فردي / متداول خاص", requirements: "اعرف عميلك، استبيان الملاءمة، هامش ضمان أولي", privileges: "التداول عبر وسيط مرخّص، نفاذ شبه فوري مؤجل" },
+        { name: "عميل مؤسساتي / شركة", requirements: "اعرف عميلك المعزز، السجل الوطني للمؤسسات، المستفيدون الفعليون، اتفاقية إطارية", privileges: "خطوط ائتمان متفاوض عليها، نفاذ API للمشتركين، تقارير مخصصة" },
+        { name: "عضو مقاصة (Clearing Member)", requirements: "ترخيص من هيئة السوق المالية، حد أدنى من رأس المال، مساهمة في صندوق الضمان", privileges: "المقاصة لحسابه الخاص وعملائه، نفاذ مباشر إلى Tunisie Clearing" },
+        { name: "صانع سوق (Market Maker)", requirements: "اتفاقية صناعة سوق، التزامات تسعير مستمرة", privileges: "تخفيضات على رسوم المعاملات، نفاذ ذو أولوية لدفتر الأوامر" },
+      ],
+      becomeMemberTxt: "في هذا النموذج التجريبي، يحاكي إنشاء حساب تجريبي الخطوة الأولى من مسار العضوية — لا يتم إجراء أي تحقق حقيقي.",
+      becomeMemberBtn: "إنشاء حساب تجريبي",
       regulatorsTitle: "للمنظمين",
       regulatorsTxt: "تمارس هيئة السوق المالية (CMF) الرقابة الاحترازية والسلوكية على بورصة سلع حقيقية، مع نفاذ مباشر إلى بيانات السوق وسجل التدقيق.",
       regulatorsPoints: [
@@ -569,6 +716,37 @@ export const I18N: Record<Lang, Dict> = {
         "صلاحية إيقاف التداول والتحقيق في التلاعب بالأسعار أو استغلال المعلومات الامتيازية",
         "التنسيق مع البنك المركزي التونسي (نظام الصرف) ولجنة التحاليل المالية (مكافحة غسل الأموال)",
       ],
+      regulatorsListTitle: "الجهات والهيئات المعنية",
+      regulators: [
+        { name: "هيئة السوق المالية (CMF)", role: "منظّم السوق المالية — الترخيص والرقابة والعقوبات" },
+        { name: "Tunisie Clearing", role: "الوديع المركزي وهيئة المقاصة والتسوية" },
+        { name: "البنك المركزي التونسي (BCT)", role: "نظام الصرف والاستقرار النقدي والمالي" },
+        { name: "لجنة التحاليل المالية (CTAF)", role: "مكافحة غسل الأموال وتمويل الإرهاب" },
+        { name: "الهيئة الوطنية لحماية المعطيات الشخصية (INPDP)", role: "حماية المعطيات الشخصية" },
+      ],
+    },
+    home: {
+      productsTitle: "المنتجات المدرجة",
+      resourcesTitle: "الموارد",
+      explore: "استكشاف",
+      optionsTeaser: "خيارات أوروبية على العقود الآجلة HOV وDGN، مسعّرة بنموذج Black-76، على كامل الآجال الاثني عشر المدرجة.",
+    },
+    auth: {
+      signIn: "تسجيل الدخول",
+      signUp: "إنشاء حساب",
+      email: "البريد الإلكتروني",
+      password: "كلمة المرور",
+      fullName: "الاسم الكامل",
+      signInBtn: "تسجيل الدخول",
+      signUpBtn: "إنشاء حسابي",
+      logOutBtn: "تسجيل الخروج",
+      noAccount: "ليس لديك حساب؟",
+      haveAccount: "لديك حساب بالفعل؟",
+      guestNote: "أنت تتصفح كزائر على الحساب التجريبي المشترك. سجّل الدخول للحصول على حسابك المحاكى الخاص.",
+      welcomeBack: "أهلاً بعودتك",
+      signUpSubtitle: "أنشئ حسابًا تجريبيًا — لا بيانات حقيقية، لا ترخيص من هيئة السوق المالية.",
+      passwordHint: "8 أحرف على الأقل.",
+      loggedInAs: "متصل باسم",
     },
     footer: "CCE — نموذج تجريبي أُنجز لأغراض الدراسة. لا يشكّل عرض خدمات استثمارية ولا منصة مرخّصة من هيئة السوق المالية ولا نصيحة استثمارية. أسعار محاكاة.",
   },

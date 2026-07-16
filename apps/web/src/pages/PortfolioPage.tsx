@@ -1,7 +1,7 @@
 import { FUTURES, ETFS, SWAPS } from "@cce/shared";
 import { Panel, Row } from "../components/Atoms";
 import { T } from "../theme";
-import { useAccount } from "../lib/useAccount";
+import { useAccount } from "../lib/AccountContext";
 import { useLang } from "../lib/LangContext";
 
 export default function PortfolioPage() {
