@@ -32,3 +32,24 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+
+  - type: web
+    name: cce-mobile-web
+    runtime: static
+    rootDir: .
+    buildCommand: npm install -g pnpm@10 && pnpm install --frozen-lockfile && pnpm --filter @cce/mobile run export:web
+    staticPublishPath: apps/mobile/dist
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      # Same idea as cce-web's VITE_API_URL/VITE_WS_URL above: point at
+      # cce-api's real URL. Expo bakes these in at export time, so changing
+      # them requires a rebuild ("Manual Deploy" on this service).
+      - key: EXPO_PUBLIC_API_URL
+        sync: false
+      - key: EXPO_PUBLIC_WS_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
