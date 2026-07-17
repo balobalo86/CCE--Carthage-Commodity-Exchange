@@ -6,6 +6,20 @@ and **options** on the futures (Black-76 pricing). Built to illustrate what such
 look like, and how it would map onto Tunisian financial regulation (CMF, Tunisie Clearing, CTAF,
 INPDP) — **not** a licensed exchange. Read [`DISCLAIMER.md`](./DISCLAIMER.md) first.
 
+## Live demo
+
+Deployed on Render (free tier — the API cold-starts after 15 min idle, ~30–50s to
+wake; see [`docs/DEPLOY.md`](./docs/DEPLOY.md) for what's expected there):
+
+- **Web terminal**: https://cce-web-1fv8.onrender.com
+- **Mobile app (browser preview)**: https://cce-mobile-web.onrender.com — the same
+  React Native code as `apps/mobile`, rendered via `react-native-web` for a quick
+  look without Expo Go; not a substitute for testing the real native build.
+- **API**: https://cce-api-t90c.onrender.com (`/api/health`)
+
+All in-memory (prices, positions, orders, sign-up accounts) and reset on redeploy or
+free-tier spin-down — see `docs/ARCHITECTURE.md`.
+
 ## Structure
 
 ```
@@ -18,7 +32,7 @@ packages/
 docs/
   ARCHITECTURE.md   What's simulated, what's real engineering, what a production build needs
   COMPLIANCE.md     Mapping to Tunisian legislation and the CMF regulatory framework
-  DEPLOY.md         Deploying apps/api + apps/web to Render
+  DEPLOY.md         Deploying apps/api + apps/web + apps/mobile (web export) to Render
 render.yaml         Render Blueprint for the above
 ```
 
