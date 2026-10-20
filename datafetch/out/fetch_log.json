@@ -1,0 +1,291 @@
+{
+ "STLAM.MI": {
+  "rows": 2384,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "STLAP.PA": {
+  "rows": 2404,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "STLA": {
+  "rows": 2360,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "RACE.MI": {
+  "rows": 2384,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "CNH": {
+  "rows": 2360,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "IVG.MI": {
+  "rows": 1220,
+  "first": "2022-01-03",
+  "last": "2026-10-20"
+ },
+ "EXO.AS": {
+  "rows": 1071,
+  "first": "2022-08-12",
+  "last": "2026-10-20"
+ },
+ "VOW3.DE": {
+  "rows": 2386,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "VOW.DE": {
+  "rows": 2386,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "P911.DE": {
+  "rows": 1032,
+  "first": "2022-09-30",
+  "last": "2026-10-20"
+ },
+ "PAH3.DE": {
+  "rows": 2386,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "8TRA.DE": {
+  "rows": 1860,
+  "first": "2019-07-01",
+  "last": "2026-10-20"
+ },
+ "RNO.PA": {
+  "rows": 2404,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "7201.T": {
+  "rows": 2312,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "7211.T": {
+  "rows": 2312,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "7203.T": {
+  "rows": 2312,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "6902.T": {
+  "rows": 2312,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "6201.T": {
+  "error": "ValueError('empty')"
+ },
+ "7259.T": {
+  "rows": 2312,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "005380.KS": {
+  "rows": 2294,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "000270.KS": {
+  "rows": 2294,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "012330.KS": {
+  "rows": 2294,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "0175.HK": {
+  "rows": 2312,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "VOLCAR-B.ST": {
+  "rows": 1250,
+  "first": "2021-10-29",
+  "last": "2026-10-20"
+ },
+ "PSNY": {
+  "rows": 1363,
+  "first": "2021-05-18",
+  "last": "2026-10-20"
+ },
+ "BMW.DE": {
+  "rows": 2386,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "MBG.DE": {
+  "rows": 2386,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "F": {
+  "rows": 2360,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "GM": {
+  "rows": 2360,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "TSLA": {
+  "rows": 2360,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "1211.HK": {
+  "rows": 2312,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "7267.T": {
+  "rows": 2312,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "600104.SS": {
+  "rows": 2277,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "BZ=F": {
+  "rows": 2363,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "CL=F": {
+  "rows": 2362,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "TTF=F": {
+  "rows": 2262,
+  "first": "2017-10-23",
+  "last": "2026-10-20"
+ },
+ "HG=F": {
+  "rows": 2362,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "ALI=F": {
+  "rows": 2357,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "PA=F": {
+  "rows": 2360,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "^STOXX50E": {
+  "rows": 2358,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "^GSPC": {
+  "rows": 2360,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "^N225": {
+  "rows": 2291,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "^KS11": {
+  "rows": 2294,
+  "first": "2017-06-01",
+  "last": "2026-10-19"
+ },
+ "^HSI": {
+  "rows": 2311,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "EURUSD=X": {
+  "rows": 2441,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "JPY=X": {
+  "rows": 2441,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "KRW=X": {
+  "rows": 2441,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "^VIX": {
+  "rows": 2362,
+  "first": "2017-06-01",
+  "last": "2026-10-20"
+ },
+ "GSCPI": {
+  "sheets": [
+   "GSCPI Overview",
+   "GSCPI Monthly Data"
+  ]
+ },
+ "gpr_monthly": {
+  "rows": 1521,
+  "cols": [
+   "month",
+   "GPR",
+   "GPRT",
+   "GPRA",
+   "GPRH",
+   "GPRHT",
+   "GPRHA",
+   "SHARE_GPR",
+   "N10",
+   "SHARE_GPRH",
+   "N3H",
+   "GPRH_NOEW"
+  ]
+ },
+ "gpr_daily": {
+  "rows": 15267,
+  "cols": [
+   "DAY",
+   "N10D",
+   "GPRD",
+   "GPRD_ACT",
+   "GPRD_THREAT",
+   "date",
+   "GPRD_MA30",
+   "GPRD_MA7",
+   "event",
+   "var_name",
+   "var_label"
+  ]
+ },
+ "FRED_DCOILBRENTEU": {
+  "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=60)\"))"
+ },
+ "FRED_PNGASEUUSDM": {
+  "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=60)\"))"
+ },
+ "FRED_INDPRO": {
+  "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=60)\"))"
+ },
+ "FRED_GEPUCURRENT": {
+  "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=60)\"))"
+ }
+}
