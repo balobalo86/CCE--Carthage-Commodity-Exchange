@@ -93,5 +93,42 @@ for sid in fred:
     except Exception as e:
         log[f"FRED_{sid}"] = {"error": repr(e)}
 
+# ---------- Nasdaq Data Link: GSCR/GSPLY (GS supply-chain data) ----------
+NASDAQ_API_KEY = "_jktyiX9zGtUzasNz6Bf"
+GSPLY_BASE = "https://data.nasdaq.com/api/v3/datatables/GSCR/GSPLY.json"
+
+try:
+    all_rows = []
+    cursor = None
+    page = 0
+    col_names = None
+    while True:
+        page += 1
+        params = {"api_key": NASDAQ_API_KEY, "qopts.per_page": 10000}
+        if cursor:
+            params["qopts.cursor_id"] = cursor
+        r = requests.get(GSPLY_BASE, params=params, timeout=120)
+        r.raise_for_status()
+        data = r.json()
+        if col_names is None:
+            col_names = [c["name"] for c in data["datatable"]["columns"]]
+            col_meta = data["datatable"]["columns"]
+        rows = data["datatable"]["data"]
+        all_rows.extend(rows)
+        print(f"GSPLY page {page}: {len(rows)} rows (total {len(all_rows)})", flush=True)
+        cursor = data.get("meta", {}).get("next_cursor_id")
+        if not cursor:
+            break
+        time.sleep(0.5)
+    import csv as _csv
+    with open(f"{OUT}/gsply_full.csv", "w", newline="") as f:
+        w = _csv.writer(f)
+        w.writerow(col_names)
+        w.writerows(all_rows)
+    json.dump(col_meta, open(f"{OUT}/gsply_columns.json", "w"), indent=2)
+    log["GSPLY"] = {"rows": len(all_rows), "columns": col_names, "pages": page}
+except Exception as e:
+    log["GSPLY"] = {"error": repr(e)}
+
 json.dump(log, open(f"{OUT}/fetch_log.json", "w"), indent=1)
 print(json.dumps(log, indent=1))
