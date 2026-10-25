@@ -95,24 +95,38 @@ for sid in fred:
 
 # ---------- Nasdaq Data Link: GSCR/GSPLY (GS supply-chain data) ----------
 NASDAQ_API_KEY = "_jktyiX9zGtUzasNz6Bf"
-GSPLY_BASE = "https://data.nasdaq.com/api/v3/datatables/GSCR/GSPLY.json"
+GSPLY_BASE = "https://data.nasdaq.com/api/v3/datatables/GSCR/GSPLY"
 
+# ---------- Attempt 1: JSON with Column_Name=VALUE (as in the user's URL) ----------
 try:
+    # First, probe the endpoint with the exact params from the user's URL
+    probe = requests.get(GSPLY_BASE + ".json",
+                         params={"api_key": NASDAQ_API_KEY, "Column_Name": "VALUE",
+                                 "qopts.per_page": 1}, timeout=60)
+    print(f"GSPLY probe status: {probe.status_code}", flush=True)
+    if probe.status_code == 403:
+        print(f"GSPLY probe response: {probe.text[:500]}", flush=True)
+    probe.raise_for_status()
+    probe_data = probe.json()
+    col_meta = probe_data["datatable"]["columns"]
+    col_names = [c["name"] for c in col_meta]
+    print(f"GSPLY columns: {col_names}", flush=True)
+    print(f"GSPLY probe rows: {len(probe_data['datatable']['data'])}", flush=True)
+    json.dump(col_meta, open(f"{OUT}/gsply_columns.json", "w"), indent=2)
+
+    # Now paginate through all data
     all_rows = []
     cursor = None
     page = 0
-    col_names = None
     while True:
         page += 1
-        params = {"api_key": NASDAQ_API_KEY, "qopts.per_page": 10000}
+        params = {"api_key": NASDAQ_API_KEY, "Column_Name": "VALUE",
+                  "qopts.per_page": 10000}
         if cursor:
             params["qopts.cursor_id"] = cursor
-        r = requests.get(GSPLY_BASE, params=params, timeout=120)
+        r = requests.get(GSPLY_BASE + ".json", params=params, timeout=120)
         r.raise_for_status()
         data = r.json()
-        if col_names is None:
-            col_names = [c["name"] for c in data["datatable"]["columns"]]
-            col_meta = data["datatable"]["columns"]
         rows = data["datatable"]["data"]
         all_rows.extend(rows)
         print(f"GSPLY page {page}: {len(rows)} rows (total {len(all_rows)})", flush=True)
@@ -125,10 +139,28 @@ try:
         w = _csv.writer(f)
         w.writerow(col_names)
         w.writerows(all_rows)
-    json.dump(col_meta, open(f"{OUT}/gsply_columns.json", "w"), indent=2)
     log["GSPLY"] = {"rows": len(all_rows), "columns": col_names, "pages": page}
 except Exception as e:
     log["GSPLY"] = {"error": repr(e)}
+    import traceback; traceback.print_exc()
+
+# ---------- Attempt 2: also try without Column_Name filter ----------
+try:
+    probe2 = requests.get(GSPLY_BASE + ".json",
+                          params={"api_key": NASDAQ_API_KEY, "qopts.per_page": 1},
+                          timeout=60)
+    print(f"GSPLY (no filter) probe status: {probe2.status_code}", flush=True)
+    if probe2.status_code == 200:
+        p2 = probe2.json()
+        cols2 = [c["name"] for c in p2["datatable"]["columns"]]
+        print(f"GSPLY (no filter) columns: {cols2}", flush=True)
+        log["GSPLY_nofilter_probe"] = {"status": 200, "columns": cols2,
+                                       "sample_row": p2["datatable"]["data"][:1]}
+    else:
+        log["GSPLY_nofilter_probe"] = {"status": probe2.status_code,
+                                       "body": probe2.text[:300]}
+except Exception as e:
+    log["GSPLY_nofilter_probe"] = {"error": repr(e)}
 
 json.dump(log, open(f"{OUT}/fetch_log.json", "w"), indent=1)
 print(json.dumps(log, indent=1))
