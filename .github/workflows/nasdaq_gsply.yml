@@ -1,0 +1,97 @@
+name: Fetch GSCR/GSPLY from Nasdaq Data Link
+on: workflow_dispatch
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install requests
+      - name: Fetch full GSPLY table
+        run: |
+          python3 << 'PYEOF'
+          import requests, csv, json, time, sys
+
+          API_KEY = "_jktyiX9zGtUzasNz6Bf"
+          BASE = "https://data.nasdaq.com/api/v3/datatables/GSCR/GSPLY"
+
+          # Step 1: fetch metadata (column definitions)
+          print("Fetching metadata...")
+          r = requests.get(BASE + ".json", params={"api_key": API_KEY, "qopts.per_page": 1})
+          r.raise_for_status()
+          meta = r.json()
+          columns = [c["name"] for c in meta["datatable"]["columns"]]
+          col_types = {c["name"]: c["type"] for c in meta["datatable"]["columns"]}
+          print(f"Columns ({len(columns)}): {columns}")
+          print(f"Column types: {col_types}")
+
+          # Save metadata
+          with open("gsply_metadata.json", "w") as f:
+              json.dump({"columns": meta["datatable"]["columns"]}, f, indent=2)
+
+          # Step 2: paginate through all data (no Column_Name filter → all columns)
+          all_rows = []
+          cursor = None
+          page = 0
+          while True:
+              page += 1
+              params = {"api_key": API_KEY, "qopts.per_page": 10000}
+              if cursor:
+                  params["qopts.cursor_id"] = cursor
+              print(f"Page {page}, cursor={cursor}, rows so far={len(all_rows)}...", flush=True)
+
+              for attempt in range(3):
+                  try:
+                      r = requests.get(BASE + ".json", params=params, timeout=120)
+                      r.raise_for_status()
+                      break
+                  except Exception as e:
+                      print(f"  Attempt {attempt+1} failed: {e}")
+                      if attempt < 2:
+                          time.sleep(5 * (attempt + 1))
+                      else:
+                          raise
+
+              data = r.json()
+              rows = data["datatable"]["data"]
+              all_rows.extend(rows)
+              print(f"  Got {len(rows)} rows (total {len(all_rows)})")
+
+              cursor = data.get("meta", {}).get("next_cursor_id")
+              if not cursor:
+                  print("No more pages.")
+                  break
+              time.sleep(0.5)  # rate limit courtesy
+
+          print(f"\nTotal rows: {len(all_rows)}")
+
+          # Step 3: write CSV
+          with open("gsply_full.csv", "w", newline="") as f:
+              w = csv.writer(f)
+              w.writerow(columns)
+              w.writerows(all_rows)
+          print(f"Written gsply_full.csv ({len(all_rows)} rows x {len(columns)} cols)")
+
+          # Step 4: summary stats
+          if all_rows:
+              # Identify unique companies, venues, frequencies
+              col_idx = {c: i for i, c in enumerate(columns)}
+              for field in columns:
+                  idx = col_idx[field]
+                  unique = set(row[idx] for row in all_rows if row[idx] is not None)
+                  if len(unique) <= 200:
+                      print(f"\nUnique {field} ({len(unique)}): {sorted(unique)[:50]}{'...' if len(unique) > 50 else ''}")
+                  else:
+                      print(f"\nUnique {field}: {len(unique)} values")
+          PYEOF
+      - name: Upload CSV artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gsply-data
+          path: |
+            gsply_full.csv
+            gsply_metadata.json
+          retention-days: 7
